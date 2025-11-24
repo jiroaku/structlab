@@ -1,0 +1,12 @@
+[
+  {
+    "nombrePasajero": "andrew",
+    "idPasajero": 1,
+    "servicio": "vip",
+    "tipoBus": "Preferencial",
+    "busAsignado": "P1",
+    "terminal": "nova",
+    "horaAtencion": "24/11/2025 13:09:13",
+    "montoCobrado": 100.0
+  }
+]

@@ -105,4 +105,22 @@ public class GestionBuses {
         }
         JOptionPane.showMessageDialog(null, texto);
     }
+
+    // Andrew - busca y retorna un bus disponible del tipo solicitado
+    public Bus obtenerBusDisponiblePorTipo(String tipoBus) {
+        if (tipoBus == null) {
+            return null;
+        }
+        NodoBus actual = primero;
+        while (actual != null) {
+            Bus candidato = actual.bus;
+            if (candidato != null
+                    && candidato.getTipo().equalsIgnoreCase(tipoBus)
+                    && "Disponible".equalsIgnoreCase(candidato.getEstado())) {
+                return candidato;
+            }
+            actual = actual.siguiente;
+        }
+        return null;
+    }
 }

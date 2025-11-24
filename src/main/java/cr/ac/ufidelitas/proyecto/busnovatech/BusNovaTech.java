@@ -35,6 +35,8 @@ public class BusNovaTech {
 
         GestionBuses gestorBuses = new GestionBuses(config);
         PersistenciaCola persistencia = new PersistenciaCola();
+        // Andrew - crea instancia del módulo 1.2 para atención de tiquetes
+        ModuloAtencionTiquetes moduloAtencion = new ModuloAtencionTiquetes(config, gestorBuses);
 
         //Cargar cola de tiquetes
         ColaPrioridad cola = persistencia.deserializarCola("tiquetes.json");
@@ -132,7 +134,7 @@ public class BusNovaTech {
                     gestorBuses.mostrarBuses();
                     break;
                 case 2:
-                    persistencia.gestionarTiquetes(cola);
+                    persistencia.gestionarTiquetes(cola, moduloAtencion);
                     break;
                 case 3:
                     JOptionPane.showMessageDialog(null,

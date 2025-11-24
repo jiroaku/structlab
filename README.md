@@ -17,6 +17,7 @@ BusNovaTech es un sistema de gestión inteligente para terminales de buses que i
 | Integrante | Módulo | Responsabilidad |
 |------------|--------|-----------------|
 | **Jeferson Andrew Fuentes García** | 1.0 | Configuración del sistema y persistencia |
+| **Jeferson Andrew Fuentes García** | 1.2 | Atención de tiquetes e historial |
 | **Samuel Alonso Mena Garro** | 1.0 | Gestión de buses |
 | **Gerald Obed Herra Fonseca** | 1.1 | Gestión de tiquetes |
 | **Luna Delgado Durango** | 1.1 | Integración de módulos, login y menú principal |
@@ -36,6 +37,9 @@ BusNovaTech es un sistema de gestión inteligente para terminales de buses que i
 | `NodoBus` | Nodo específico para lista de buses | Samuel |
 | `Bus` | Entidad de bus con propiedades básicas | Samuel |
 | `PersistenciaCola` | Serialización/deserialización de tiquetes | Gerald |
+| `ModuloAtencionTiquetes` | Automatiza y gestiona el módulo 1.2 | Andrew |
+| `HistorialAtenciones` | Control y persistencia de atendidos | Andrew |
+| `RegistroAtencion` | Representa un abordaje confirmado | Andrew |
 
 ## Módulos Implementados
 
@@ -82,6 +86,21 @@ BusNovaTech es un sistema de gestión inteligente para terminales de buses que i
 - **Hora de abordaje:** Timestamp de abordaje (inicialmente -1)
 - **Servicio:** Tipo de servicio (VIP, Regular, Carga, Ejecutivo)
 - **Tipo de bus:** Clasificación (P, D, N)
+
+### Módulo 1.2 - Atención de Tiquetes
+
+**Objetivo:** Administrar la atención por parte de los inspectores, garantizando cobro correcto, actualización de horarios y registro persistente en `atendidos.json`.
+
+#### Funcionalidades Implementadas
+
+| Funcionalidad | Descripción | Estado |
+|---------------|-------------|--------|
+| Gestión manual de cola | El tiquete creado permanece en espera hasta usar “Abordar” | ✅ |
+| Acción “Abordar” | Opción de menú para que el inspector atienda manualmente al siguiente pasajero | ✅ |
+| Validación de pago | Se calcula el monto según el servicio y se solicita confirmación antes de abordar | ✅ |
+| Manejo de rechazos | Si el pasajero no paga, es expulsado de la cola y debe crear un nuevo tiquete | ✅ |
+| Registro histórico | Cada abordaje se guarda con hora, bus y terminal en `atendidos.json` | ✅ |
+| Visualización de atendidos | Consulta del historial mediante interfaz gráfica | ✅ |
 
 ## Sistema de Prioridades
 
@@ -131,6 +150,7 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 |---------|-----------|---------|
 | `config.json` | Configuración del sistema | JSON |
 | `tiquetes.json` | Cola de tiquetes persistente | JSON |
+| `atendidos.json` | Historial de tiquetes abordados | JSON |
 
 
 ## Características Técnicas

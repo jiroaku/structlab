@@ -1,6 +1,8 @@
 
 package cr.ac.ufidelitas.proyecto.busnovatech;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JOptionPane;
 
 /**
@@ -52,12 +54,20 @@ public class ColaPrioridad {
     }
 
     private int getPrioridad(String tipoBus) {
-        switch (tipoBus.toUpperCase()) {
-            case "V.I.P": return 3;
-            case "NORMAL": return 2;
-            case "ECONOMICO": return 1;
-            default: return 0;
+        if (tipoBus == null) {
+            return 0;
         }
+        String codigo = tipoBus.trim().toUpperCase();
+        if (codigo.startsWith("P")) { // Preferencial
+            return 3;
+        }
+        if (codigo.startsWith("D")) { // Directo
+            return 2;
+        }
+        if (codigo.startsWith("N")) { // Normal
+            return 1;
+        }
+        return 0;
     }
 
     //Desencolar
@@ -81,14 +91,25 @@ public class ColaPrioridad {
     //Mostrar
     public void mostrarCola() {
         if (frente == null) {
-            System.out.println("Cola vacía");
+            JOptionPane.showMessageDialog(null, "La cola está vacía.");
             return;
         }
+        // Andrew - construye mensaje formateado con todos los tiquetes
+        StringBuilder sb = new StringBuilder("=== Cola de tiquetes ===\n\n");
         Nodo<NodoTiquete> actual = frente;
         while (actual != null) {
-            System.out.println(actual.getDato());
+            NodoTiquete tiquete = actual.getDato();
+            sb.append("Pasajero: ").append(tiquete.getNombre()).append("\n")
+              .append("ID: ").append(tiquete.getId()).append("\n")
+              .append("Servicio: ").append(tiquete.getServicio()).append("\n")
+              .append("Tipo bus: ").append(tiquete.getTipoBus()).append("\n")
+              .append("Hora compra: ").append(tiquete.getHoraCompra()).append("\n")
+              .append("Hora abordaje: ").append(tiquete.getHoraAbordaje()).append("\n")
+              .append("----------------------------------\n");
             actual = actual.getSiguiente();
         }
+        JOptionPane.showMessageDialog(null, sb.toString(),
+                "BusNovaTech - Cola de tiquetes", JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override
@@ -104,31 +125,88 @@ public class ColaPrioridad {
         return sb.toString();
     }
 
-    // Creación de tiquetes con interfaz de usuario - Andrew
-    public void crearTiquete() {
+    // Andrew - crea tiquete con datos del usuario y hora automática
+    public NodoTiquete crearTiquete() {
         try {
             String nombre = JOptionPane.showInputDialog("Nombre del pasajero:");
             if (nombre == null || nombre.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Nombre es requerido");
-                return;
+                return null;
             }
 
             int id = Integer.parseInt(JOptionPane.showInputDialog("ID del pasajero:"));
             int edad = Integer.parseInt(JOptionPane.showInputDialog("Edad del pasajero:"));
-            double moneda = Double.parseDouble(JOptionPane.showInputDialog("Monto a pagar:"));
-            String horaCompra = JOptionPane.showInputDialog("Hora de compra (HH:MM):");
-            String horaAbordaje = JOptionPane.showInputDialog("Hora de abordaje (HH:MM):");
             String servicio = JOptionPane.showInputDialog("Tipo de servicio (VIP/Regular/Carga/Ejecutivo):");
             String tipoBus = JOptionPane.showInputDialog("Tipo de bus (P/D/N):");
 
-            NodoTiquete nuevoTiquete = new NodoTiquete(nombre, id, edad, moneda,
+            String horaCompra = obtenerHoraActual();
+            String horaAbordaje = "-1";
+            double montoPendiente = 0.0;
+
+            NodoTiquete nuevoTiquete = new NodoTiquete(nombre, id, edad, montoPendiente,
                                                       horaCompra, horaAbordaje, servicio, tipoBus);
             this.encolar(nuevoTiquete);
 
             JOptionPane.showMessageDialog(null, "Tiquete creado exitosamente");
+            return nuevoTiquete;
 
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Error en los datos ingresados");
+            return null;
         }
+    }
+
+    // Andrew - retorna el tiquete del frente sin desencolarlo
+    public NodoTiquete verFrente() {
+        if (frente == null) {
+            return null;
+        }
+        return frente.getDato();
+    }
+
+    // Andrew - obtiene hora del sistema en formato dd/MM/yyyy HH:mm:ss
+    private String obtenerHoraActual() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        return LocalDateTime.now().format(formatter);
+    }
+
+    // Andrew - convierte la cola en arreglo para serialización JSON
+    public NodoTiquete[] exportarTiquetes() {
+        int tamano = contarNodos();
+        NodoTiquete[] datos = new NodoTiquete[tamano];
+        Nodo<NodoTiquete> actual = frente;
+        int indice = 0;
+        while (actual != null) {
+            datos[indice] = actual.getDato();
+            indice++;
+            actual = actual.getSiguiente();
+        }
+        return datos;
+    }
+
+    // Andrew - reconstruye la cola desde un arreglo de tiquetes
+    public void importarTiquetes(NodoTiquete[] tiquetes) {
+        frente = null;
+        fin = null;
+        if (tiquetes == null) {
+            return;
+        }
+        for (int i = 0; i < tiquetes.length; i++) {
+            NodoTiquete tiquete = tiquetes[i];
+            if (tiquete != null) {
+                encolar(tiquete);
+            }
+        }
+    }
+
+    // Andrew - cuenta nodos de la cola para determinar tamaño
+    private int contarNodos() {
+        int contador = 0;
+        Nodo<NodoTiquete> actual = frente;
+        while (actual != null) {
+            contador++;
+            actual = actual.getSiguiente();
+        }
+        return contador;
     }
 }

@@ -1,0 +1,11 @@
+{
+  "nombreTerminal": "nova",
+  "cantidadBuses": 5,
+  "busesPreferenciales": 1,
+  "busesDirectos": 1,
+  "busesNormales": 3,
+  "usuario1": "adm1",
+  "contra1": "123",
+  "usuario2": "adm2",
+  "contra2": "123"
+}
