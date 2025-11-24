@@ -156,7 +156,7 @@ public class ColaPrioridad {
         }
     }
 
-    // Andrew - retorna el tiquete del frente sin desencolarlo
+    // Retorna el tiquete del frente sin desencolarlo
     public NodoTiquete verFrente() {
         if (frente == null) {
             return null;
@@ -164,13 +164,13 @@ public class ColaPrioridad {
         return frente.getDato();
     }
 
-    // Andrew - obtiene hora del sistema en formato dd/MM/yyyy HH:mm:ss
+    // Obtiene hora del sistema en formato dd/MM/yyyy HH:mm:ss
     private String obtenerHoraActual() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         return LocalDateTime.now().format(formatter);
     }
 
-    // Andrew - convierte la cola en arreglo para serialización JSON
+    // Convierte la cola en arreglo para serialización JSON
     public NodoTiquete[] exportarTiquetes() {
         int tamano = contarNodos();
         NodoTiquete[] datos = new NodoTiquete[tamano];
@@ -184,7 +184,7 @@ public class ColaPrioridad {
         return datos;
     }
 
-    // Andrew - reconstruye la cola desde un arreglo de tiquetes
+    // Reconstruye la cola desde un arreglo de tiquetes
     public void importarTiquetes(NodoTiquete[] tiquetes) {
         frente = null;
         fin = null;
@@ -199,7 +199,7 @@ public class ColaPrioridad {
         }
     }
 
-    // Andrew - cuenta nodos de la cola para determinar tamaño
+    // Cuenta nodos de la cola para determinar tamaño
     private int contarNodos() {
         int contador = 0;
         Nodo<NodoTiquete> actual = frente;
