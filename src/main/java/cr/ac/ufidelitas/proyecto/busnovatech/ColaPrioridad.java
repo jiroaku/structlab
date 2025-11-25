@@ -125,7 +125,7 @@ public class ColaPrioridad {
         return sb.toString();
     }
 
-    // Andrew - crea tiquete con datos del usuario y hora automática
+    // Andrew - crea tiquete con datos del usuario, ID autoincremental y hora automática
     public NodoTiquete crearTiquete() {
         try {
             String nombre = JOptionPane.showInputDialog("Nombre del pasajero:");
@@ -134,7 +134,9 @@ public class ColaPrioridad {
                 return null;
             }
 
-            int id = Integer.parseInt(JOptionPane.showInputDialog("ID del pasajero:"));
+            // ID autoincremental basado en tiquetes.json y atendidos.json
+            int id = GestorIdPasajero.obtenerSiguienteId();
+
             int edad = Integer.parseInt(JOptionPane.showInputDialog("Edad del pasajero:"));
             String servicio = JOptionPane.showInputDialog("Tipo de servicio (VIP/Regular/Carga/Ejecutivo):");
             String tipoBus = JOptionPane.showInputDialog("Tipo de bus (P/D/N):");
@@ -147,7 +149,10 @@ public class ColaPrioridad {
                                                       horaCompra, horaAbordaje, servicio, tipoBus);
             this.encolar(nuevoTiquete);
 
-            JOptionPane.showMessageDialog(null, "Tiquete creado exitosamente");
+            JOptionPane.showMessageDialog(null,
+                    "Tiquete creado exitosamente\nID asignado: " + id,
+                    "BusNovaTech - Tiquete creado",
+                    JOptionPane.INFORMATION_MESSAGE);
             return nuevoTiquete;
 
         } catch (NumberFormatException e) {
