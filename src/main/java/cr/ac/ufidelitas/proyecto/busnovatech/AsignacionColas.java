@@ -27,50 +27,81 @@ public class AsignacionColas {
         }
     }
 
-    //REGLA DE ASIGNACIÓN
+    //REGLA DE ASIGNACIÓN - acepta códigos P/D/N o nombres completos
     public String asignarTiquete(String tipoTiquete) {
+        if (tipoTiquete == null) {
+            return "ERROR: Tipo de tiquete inválido.";
+        }
 
-        tipoTiquete = tipoTiquete.toLowerCase();
+        String tipo = tipoTiquete.trim().toLowerCase();
 
-        // Preferencial
-        if (tipoTiquete.equals("preferencial")) {
+        // Convertir códigos a nombres para comparación
+        String tipoBusBuscado = null;
+        if (tipo.equals("p") || tipo.startsWith("preferencial")) {
+            tipoBusBuscado = "Preferencial";
+        } else if (tipo.equals("d") || tipo.startsWith("directo")) {
+            tipoBusBuscado = "Directo";
+        } else if (tipo.equals("n") || tipo.startsWith("normal")) {
+            tipoBusBuscado = "Normal";
+        } else {
+            return "ERROR: Tipo de tiquete inválido.";
+        }
+
+        // Preferencial o Directo - asignar al único bus del tipo
+        if (tipoBusBuscado.equals("Preferencial") || tipoBusBuscado.equals("Directo")) {
             NodoCola actual = primero;
             while (actual != null) {
-                if (actual.bus.getTipo().equalsIgnoreCase("Preferencial")) {
+                if (actual.bus.getTipo().equalsIgnoreCase(tipoBusBuscado)) {
                     actual.cantidad++;
                     return actual.bus.getIdBus();
                 }
                 actual = actual.siguiente;
             }
-            return "ERROR: No existe bus preferencial.";
+            return "ERROR: No existe bus " + tipoBusBuscado.toLowerCase() + ".";
         }
 
-        // Directo
-        if (tipoTiquete.equals("directo")) {
-            NodoCola actual = primero;
-            while (actual != null) {
-                if (actual.bus.getTipo().equalsIgnoreCase("Directo")) {
-                    actual.cantidad++;
-                    return actual.bus.getIdBus();
-                }
-                actual = actual.siguiente;
-            }
-            return "ERROR: No existe bus directo.";
+        // Normal - asignar al bus con menor cantidad en cola
+        if (primero == null) {
+            return "ERROR: No hay buses disponibles.";
         }
 
-        // Normal, menor cantidad en cola
         NodoCola actual = primero;
         NodoCola menor = primero;
 
         while (actual != null) {
-            if (actual.cantidad < menor.cantidad) {
-                menor = actual;
+            // Solo considerar buses normales
+            if (actual.bus.getTipo().equalsIgnoreCase("Normal")) {
+                if (actual.cantidad < menor.cantidad || !menor.bus.getTipo().equalsIgnoreCase("Normal")) {
+                    menor = actual;
+                }
             }
             actual = actual.siguiente;
         }
 
+        // Verificar que se encontró un bus normal
+        if (!menor.bus.getTipo().equalsIgnoreCase("Normal")) {
+            return "ERROR: No hay buses normales disponibles.";
+        }
+
         menor.cantidad++;
         return menor.bus.getIdBus();
+    }
+
+    // Decrementa la cantidad en la cola del bus cuando se atiende un tiquete
+    public void decrementarCola(String busId) {
+        if (busId == null) {
+            return;
+        }
+        NodoCola actual = primero;
+        while (actual != null) {
+            if (actual.bus.getIdBus().equalsIgnoreCase(busId)) {
+                if (actual.cantidad > 0) {
+                    actual.cantidad--;
+                }
+                return;
+            }
+            actual = actual.siguiente;
+        }
     }
 
     // Mostrar estado para Persona C
@@ -86,7 +117,26 @@ public class AsignacionColas {
 
         return texto;
     }
-    
+
+    // Actualiza la cantidad de un bus existente por su ID
+    public void actualizarCantidadBus(String busId, int cantidad) {
+        if (busId == null) {
+            return;
+        }
+        NodoCola actual = primero;
+        while (actual != null) {
+            if (actual.bus.getIdBus().equalsIgnoreCase(busId)) {
+                if (cantidad < 0) {
+                    actual.cantidad = 0;
+                } else {
+                    actual.cantidad = cantidad;
+                }
+                return;
+            }
+            actual = actual.siguiente;
+        }
+    }
+
     //Luna
     public NodoCola getPrimero() {
         return primero;

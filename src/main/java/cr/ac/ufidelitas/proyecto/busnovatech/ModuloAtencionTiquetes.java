@@ -24,12 +24,12 @@ public class ModuloAtencionTiquetes {
 
 
     // Atiende tiquete desde opción 3 del menú de gestión
-    public void atenderDesdeMenu(ColaPrioridad cola) {
+    public void atenderDesdeMenu(ColaPrioridad cola, AsignacionColas colas) {
         if (cola == null || cola.estaVacia()) {
             JOptionPane.showMessageDialog(null, "No hay tiquetes pendientes para abordar.");
             return;
         }
-        procesarAtencionDesdeCola(cola, false);
+        procesarAtencionDesdeCola(cola, false, colas);
     }
 
     // Muestra historial de tiquetes atendidos
@@ -38,7 +38,7 @@ public class ModuloAtencionTiquetes {
     }
 
     // Procesa atención completa: bus, cobro, pago y registro
-    private void procesarAtencionDesdeCola(ColaPrioridad cola, boolean esAutomatico) {
+    private void procesarAtencionDesdeCola(ColaPrioridad cola, boolean esAutomatico, AsignacionColas colas) {
         if (cola == null || cola.estaVacia()) {
             return;
         }
@@ -71,6 +71,10 @@ public class ModuloAtencionTiquetes {
             busDisponible.setEstado("Disponible");
             tiqueteAtender.setHoraAbordaje("-1");
             tiqueteAtender.setMoneda(0);
+            // Si el pago es rechazado, decrementar la cola del bus
+            if (colas != null && busDisponible != null) {
+                colas.decrementarCola(busDisponible.getIdBus());
+            }
             JOptionPane.showMessageDialog(null,
                     "El pasajero se negó a pagar y fue retirado de la fila.\n"
                     + "Debe volver a crear un tiquete desde el módulo 1.1.",
@@ -83,6 +87,11 @@ public class ModuloAtencionTiquetes {
         tiqueteAtender.setMoneda(monto);
 
         registrarAtendido(tiqueteAtender, busDisponible, monto);
+
+        // Integración módulo 1.3 - decrementar cola cuando se atiende exitosamente
+        if (colas != null && busDisponible != null) {
+            colas.decrementarCola(busDisponible.getIdBus());
+        }
 
         busDisponible.setEstado("Disponible");
 

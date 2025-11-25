@@ -46,8 +46,8 @@ public class PersistenciaCola {
         return null;
     }
 
-    // Andrew - menú principal de gestión de tiquetes con opciones 1.2
-    public void gestionarTiquetes(ColaPrioridad cola, ModuloAtencionTiquetes moduloAtencion) {
+    // Andrew - menú principal de gestión de tiquetes con opciones 1.2 y 1.3
+    public void gestionarTiquetes(ColaPrioridad cola, ModuloAtencionTiquetes moduloAtencion, AsignacionColas colas) {
         int opcion;
         do {
             String menu = "=== GESTIÓN DE TIQUETES ===\n"
@@ -55,8 +55,9 @@ public class PersistenciaCola {
                     + "2. Ver cola de tiquetes\n"
                     + "3. Abordar pasajero\n"
                     + "4. Ver historial de atendidos\n"
-                    + "5. Guardar tiquetes\n"
-                    + "6. Volver al menú principal";
+                    + "5. Ver estado de colas de buses\n"
+                    + "6. Guardar tiquetes\n"
+                    + "7. Volver al menú principal";
 
             try {
                 opcion = Integer.parseInt(JOptionPane.showInputDialog(menu));
@@ -67,7 +68,26 @@ public class PersistenciaCola {
             switch (opcion) {
                 case 1: {
                     NodoTiquete nuevo = cola.crearTiquete();
-                    if (nuevo != null) {
+                    if (nuevo != null && colas != null) {
+                        // Integración módulo 1.3 - asignar tiquete a bus automáticamente
+                        String busAsignado = colas.asignarTiquete(nuevo.getTipoBus());
+                        if (busAsignado != null && !busAsignado.startsWith("ERROR")) {
+                            serializarCola(cola, "tiquetes.json");
+                            JOptionPane.showMessageDialog(null,
+                                    "Tiquete agregado y guardado.\n"
+                                    + "Asignado al bus: " + busAsignado + "\n"
+                                    + "Use las opciones 2, 3 o 5 para gestionarlo.",
+                                    "BusNovaTech - Cola de tiquetes",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            serializarCola(cola, "tiquetes.json");
+                            JOptionPane.showMessageDialog(null,
+                                    "Tiquete agregado pero hubo un problema con la asignación.\n"
+                                    + busAsignado,
+                                    "BusNovaTech - Advertencia",
+                                    JOptionPane.WARNING_MESSAGE);
+                        }
+                    } else if (nuevo != null) {
                         serializarCola(cola, "tiquetes.json");
                         JOptionPane.showMessageDialog(null,
                                 "Tiquete agregado y guardado.\nUse las opciones 2 o 3 para gestionarlo.",
@@ -81,7 +101,7 @@ public class PersistenciaCola {
                     break;
                 case 3:
                     if (moduloAtencion != null) {
-                        moduloAtencion.atenderDesdeMenu(cola);
+                        moduloAtencion.atenderDesdeMenu(cola, colas);
                         serializarCola(cola, "tiquetes.json");
                     }
                     break;
@@ -91,16 +111,26 @@ public class PersistenciaCola {
                     }
                     break;
                 case 5:
+                    if (colas != null) {
+                        String estado = colas.obtenerEstadoColas();
+                        JOptionPane.showMessageDialog(null, estado,
+                                "BusNovaTech - Estado de colas",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Sistema de colas no disponible.");
+                    }
+                    break;
+                case 6:
                     this.serializarCola(cola, "tiquetes.json");
                     JOptionPane.showMessageDialog(null, "Tiquetes guardados exitosamente");
                     break;
-                case 6:
+                case 7:
                     break;
                 default:
                     JOptionPane.showMessageDialog(null, "Opción inválida");
                     break;
             }
-        } while (opcion != 6);
+        } while (opcion != 7);
     }
 
     // Guarda la lista de colas en colas.txt
@@ -122,7 +152,8 @@ public class PersistenciaCola {
         }
     }
 
-    // Carga colas desde colas.txt y las agrega a AsignacionColas
+    // Carga colas desde colas.txt y actualiza las cantidades en AsignacionColas
+    // Evita duplicados actualizando buses existentes en lugar de agregar nuevos
     public static void cargarColas(AsignacionColas colas, GestionBuses gestionBuses) {
         if (colas == null || gestionBuses == null) {
             return;
@@ -130,33 +161,41 @@ public class PersistenciaCola {
 
         File archivo = new File(ARCHIVO);
         if (!archivo.exists()) {
-            JOptionPane.showMessageDialog(null, "Archivo colas.txt no existe, se creará al salir.");
+            // Archivo no existe, se creará al salir con las cantidades iniciales (0)
             return;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(archivo))) {
             String linea;
             while ((linea = reader.readLine()) != null) {
+                linea = linea.trim();
+                if (linea.isEmpty()) {
+                    continue;
+                }
+
                 String[] partes = linea.split(",");
                 if (partes.length != 2) {
                     continue;
                 }
 
                 String busId = partes[0].trim();
-                int cantidad = Integer.parseInt(partes[1].trim());
+                int cantidad;
+                try {
+                    cantidad = Integer.parseInt(partes[1].trim());
+                } catch (NumberFormatException e) {
+                    continue; // Saltar líneas con formato inválido
+                }
 
                 if (cantidad < 0) {
-                    cantidad = 0; 
+                    cantidad = 0;
                 }
-                Bus bus = gestionBuses.obtenerBusPorId(busId);
-                if (bus != null) {
-                    colas.agregarBus(bus, cantidad);
-                }
+
+                // Actualizar cantidad del bus existente en lugar de agregar uno nuevo
+                colas.actualizarCantidadBus(busId, cantidad);
             }
         } catch (IOException | NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Error al cargar colas: " + e.getMessage()
-                    + "\nSe restablecerá la lista de colas.");
-            colas = new AsignacionColas();
+            // Si hay error, las colas quedan con cantidades en 0 (ya inicializadas)
+            // No es necesario mostrar error si el archivo está corrupto, simplemente usar valores por defecto
         }
     }
 

@@ -38,18 +38,18 @@ public class BusNovaTech {
         // Andrew - crea instancia del módulo 1.2 para atención de tiquetes
         ModuloAtencionTiquetes moduloAtencion = new ModuloAtencionTiquetes(config, gestorBuses);
 
-        // Luna - crea una isntancia del módulo 1.3 de llenado de colas
+        // Luna - crea una instancia del módulo 1.3 de llenado de colas
         AsignacionColas colas = new AsignacionColas();
 
-        // Llenar colas con los buses existentes
+        // Llenar colas con los buses existentes (inicialmente con cantidad 0)
         NodoBus actual = gestorBuses.getPrimero();
         while (actual != null) {
             colas.agregarBus(actual.bus, 0);
             actual = actual.siguiente;
         }
 
-        // Guardar colas en colas.txt 
-        PersistenciaCola.guardarColas(colas);
+        // Cargar colas desde colas.txt si existe (restaura cantidades previas)
+        PersistenciaCola.cargarColas(colas, gestorBuses);
 
         //Cargar cola de tiquetes
         ColaPrioridad cola = persistencia.deserializarCola("tiquetes.json");
@@ -147,7 +147,7 @@ public class BusNovaTech {
                     gestorBuses.mostrarBuses();
                     break;
                 case 2:
-                    persistencia.gestionarTiquetes(cola, moduloAtencion);
+                    persistencia.gestionarTiquetes(cola, moduloAtencion, colas);
                     break;
                 case 3:
                     JOptionPane.showMessageDialog(null,
@@ -155,6 +155,8 @@ public class BusNovaTech {
                             "BusNovaTech - Cierre del sistema",
                             JOptionPane.INFORMATION_MESSAGE);
                     persistencia.serializarCola(cola, "tiquetes.json");
+                    // Guardar estado de colas antes de salir
+                    PersistenciaCola.guardarColas(colas);
                     break;
                 default:
                     break;
