@@ -10,7 +10,7 @@
 
 ## Descripción General Segunda Entrega
 
-BusNovaTech es un sistema de gestión inteligente para terminales de buses que implementa estructuras de datos dinámicas para la administración de buses, tiquetes y configuración del sistema. El proyecto desarrolla los módulos 1.0 (Configuración de Estructuras de Datos), 1.1 (Creación de Tiquetes) y 1.2 (Atención de Tiquetes) utilizando únicamente clases básicas de Java y manejo de archivos JSON.
+BusNovaTech es un sistema de gestión inteligente para terminales de buses que implementa estructuras de datos dinámicas para la administración de buses, tiquetes y configuración del sistema. El proyecto desarrolla los módulos 1.0 (Configuración de Estructuras de Datos), 1.1 (Creación de Tiquetes), 1.2 (Atención de Tiquetes) y 1.3 (Llenado de las Colas) utilizando únicamente clases básicas de Java y manejo de archivos JSON/TXT.
 
 ## Equipo de Desarrollo
 
@@ -19,8 +19,11 @@ BusNovaTech es un sistema de gestión inteligente para terminales de buses que i
 | **Jeferson Andrew Fuentes García** | 1.0 | Configuración del sistema y persistencia |
 | **Jeferson Andrew Fuentes García** | 1.2 | Atención de tiquetes e historial |
 | **Samuel Alonso Mena Garro** | 1.0 | Gestión de buses |
+| **Samuel Alonso Mena Garro** | 1.3 | Lógica de asignación de tiquetes a buses |
 | **Gerald Obed Herra Fonseca** | 1.1 | Gestión de tiquetes |
 | **Luna Delgado Durango** | 1.1 | Integración de módulos, login y menú principal |
+| **Luna Delgado Durango** | 1.3 | Persistencia de colas (colas.txt) |
+| **Gerald Obed Herra Fonseca** | 1.3 | Interfaz y validación de flujo |
 
 ## Arquitectura del Sistema
 
@@ -36,10 +39,13 @@ BusNovaTech es un sistema de gestión inteligente para terminales de buses que i
 | `Nodo<T>` | Nodo genérico para estructuras enlazadas | Gerald |
 | `NodoBus` | Nodo específico para lista de buses | Samuel |
 | `Bus` | Entidad de bus con propiedades básicas | Samuel |
-| `PersistenciaCola` | Serialización/deserialización de tiquetes | Gerald |
+| `PersistenciaCola` | Serialización/deserialización de tiquetes y colas | Gerald/Luna |
 | `ModuloAtencionTiquetes` | Automatiza y gestiona el módulo 1.2 | Andrew |
 | `HistorialAtenciones` | Control y persistencia de atendidos | Andrew |
 | `RegistroAtencion` | Representa un abordaje confirmado | Andrew |
+| `AsignacionColas` | Lógica de asignación de tiquetes a buses (Módulo 1.3) | Samuel |
+| `NodoCola` | Nodo para lista de colas de buses | Samuel |
+| `GestorIdPasajero` | Generación de IDs autoincrementales | Integración |
 
 ## Módulos Implementados
 
@@ -79,13 +85,16 @@ BusNovaTech es un sistema de gestión inteligente para terminales de buses que i
 
 #### Estructura del Tiquete
 - **Nombre:** Identificación del pasajero
-- **ID:** Identificador único numérico
+- **ID:** Identificador único numérico (autoincremental, generado automáticamente)
 - **Edad:** Edad del pasajero
 - **Moneda:** Monto a pagar (double)
-- **Hora de compra:** Timestamp de compra
+- **Hora de compra:** Timestamp de compra (obtenido automáticamente del sistema)
 - **Hora de abordaje:** Timestamp de abordaje (inicialmente -1)
 - **Servicio:** Tipo de servicio (VIP, Regular, Carga, Ejecutivo)
 - **Tipo de bus:** Clasificación (P, D, N)
+
+#### Mejora Implementada: ID Autoincremental
+El sistema genera automáticamente los IDs de pasajeros basándose en el máximo ID existente en `tiquetes.json` y `atendidos.json`, evitando duplicados y mejorando la experiencia de usuario.
 
 ### Módulo 1.2 - Atención de Tiquetes
 
@@ -111,6 +120,35 @@ Según la especificación, el módulo 1.2 contempla dos formas de atención:
 2. **Atención manual**: Funcionalidad "Abordar" para cuando las filas están llenas.
 
 **Decisión de implementación**: Se optó por implementar únicamente la atención manual mediante la opción "Abordar" del menú, permitiendo al usuario tener control total sobre cuándo atender a cada pasajero. Esto facilita la demostración y el uso del sistema, ya que el usuario puede crear múltiples tiquetes y luego decidir cuándo atenderlos. La atención automática puede ser implementada en futuras versiones si se requiere.
+
+### Módulo 1.3 - Llenado de las Colas
+
+**Objetivo:** Implementar el sistema de asignación automática de tiquetes a buses según reglas específicas, considerando el tamaño actual de las colas de cada bus.
+
+#### Funcionalidades Implementadas
+
+| Funcionalidad | Descripción | Estado |
+|---------------|-------------|--------|
+| Asignación automática | Al crear tiquete, se asigna automáticamente a un bus | ✅ |
+| Reglas de asignación | Preferencial/Directo al único bus, Normal al de menor cola | ✅ |
+| Gestión de colas | Mantiene cantidad de personas en cola por cada bus | ✅ |
+| Persistencia de colas | Guardado en `colas.txt` (formato texto simple) | ✅ |
+| Carga de colas | Restaura estado de colas al iniciar el sistema | ✅ |
+| Actualización de colas | Decrementa cola al atender tiquetes | ✅ |
+| Visualización de estado | Opción de menú para ver estado de todas las colas | ✅ |
+
+#### Reglas de Asignación
+
+- **Tiquete Preferencial (P):** Se asigna siempre al único bus preferencial (P1)
+- **Tiquete Directo (D):** Se asigna siempre al único bus directo (D1)
+- **Tiquete Normal (N):** Se asigna al bus normal con menor cantidad de personas en cola
+  - En caso de empate, se asigna al primer bus encontrado con esa cantidad
+
+#### Integración con Módulos Existentes
+
+- **Módulo 1.1:** Al crear un tiquete, se asigna automáticamente a un bus y se incrementa su cola
+- **Módulo 1.2:** Al atender un tiquete (pago aceptado o rechazado), se decrementa la cola del bus correspondiente
+- **Persistencia:** Las colas se guardan en `colas.txt` al cerrar el sistema y se cargan al iniciar
 
 ## Sistema de Prioridades
 
@@ -151,10 +189,13 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 ├── Nodo.java                 # Nodo genérico para estructuras
 ├── NodoBus.java              # Nodo específico para buses
 ├── Bus.java                  # Entidad de bus
-├── PersistenciaCola.java     # Módulo 1.1 - Persistencia
+├── PersistenciaCola.java     # Módulo 1.1/1.3 - Persistencia de tiquetes y colas
 ├── ModuloAtencionTiquetes.java # Módulo 1.2 - Atención de tiquetes
 ├── HistorialAtenciones.java    # Módulo 1.2 - Historial de atendidos
-└── RegistroAtencion.java       # Módulo 1.2 - Registro de atención
+├── RegistroAtencion.java       # Módulo 1.2 - Registro de atención
+├── AsignacionColas.java        # Módulo 1.3 - Lógica de asignación de tiquetes
+├── NodoCola.java               # Módulo 1.3 - Nodo para colas de buses
+└── GestorIdPasajero.java       # Utilidad - Generación de IDs autoincrementales
 ```
 
 ## Archivos de Datos
@@ -164,12 +205,13 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 | `config.json` | Configuración del sistema | JSON |
 | `tiquetes.json` | Cola de tiquetes persistente | JSON |
 | `atendidos.json` | Historial de tiquetes abordados | JSON |
+| `colas.txt` | Estado de colas de buses (cantidad de personas por bus) | TXT |
 
 
 ## Características Técnicas
 
 ### Estructuras de Datos Implementadas
-- **Lista Enlazada:** Para gestión de buses
+- **Lista Enlazada:** Para gestión de buses y colas de buses
 - **Cola de Prioridad:** Para organización de tiquetes
 - **Nodos Genéricos:** Para flexibilidad en estructuras
 
@@ -199,6 +241,7 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 - ✅ Implementación de cola de prioridad según tipo de bus (P/D/N)
 - ✅ Validación de datos de entrada
 - ✅ Asignación automática de hora de compra del sistema
+- ✅ **ID autoincremental:** Generación automática de IDs basada en máximo existente
 - ✅ Persistencia de tiquetes en `tiquetes.json`
 - ✅ Carga de tiquetes pendientes al iniciar el sistema
 - ✅ Visualización de cola de tiquetes
@@ -224,12 +267,17 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 - ✅ Visualización de historial de atendidos mediante opción de menú
 - ✅ Persistencia automática después de cada atención
 
-## Requerimientos Pendientes
+### Módulo 1.3 - Llenado de las Colas ✅
+- ✅ Asignación automática de tiquetes a buses al crear tiquete
+- ✅ Reglas de asignación: Preferencial/Directo al único bus, Normal al de menor cola
+- ✅ Gestión de cantidades de personas en cola por cada bus
+- ✅ Persistencia de colas en `colas.txt` (formato texto simple)
+- ✅ Carga de colas al iniciar el sistema (restaura cantidades)
+- ✅ Actualización automática de colas al atender tiquetes
+- ✅ Visualización del estado de todas las colas mediante opción de menú
+- ✅ Integración completa con módulos 1.1 y 1.2
 
-### Módulo 1.3 - Llenado de las Colas ⏳
-- ⏳ Asignación automática de tiquetes normales al bus con menor cola
-- ⏳ Persistencia de colas en `colas.json`
-- ⏳ Carga de colas al iniciar el sistema
+## Requerimientos Pendientes
 
 ### Módulo 1.4 - Servicios Complementarios ⏳
 - ⏳ Implementación de grafo ponderado dirigido
@@ -248,7 +296,7 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 **Módulo 1.0:** ✅ Completado
 **Módulo 1.1:** ✅ Completado
 **Módulo 1.2:** ✅ Completado
-**Módulo 1.3:** ⏳ Pendiente
+**Módulo 1.3:** ✅ Completado
 **Módulo 1.4:** ⏳ Pendiente
 **Módulo 1.5:** ⏳ Pendiente
 **Integración:** ✅ Completada
@@ -276,12 +324,13 @@ El sistema requiere autenticación con uno de los usuarios configurados. Las cre
 
 ### Archivos de Datos
 
-El sistema genera y utiliza los siguientes archivos JSON:
-- `config.json`: Configuración del sistema (terminal, buses, usuarios)
-- `tiquetes.json`: Cola de tiquetes pendientes de atención
-- `atendidos.json`: Historial de tiquetes atendidos
+El sistema genera y utiliza los siguientes archivos:
+- `config.json`: Configuración del sistema (terminal, buses, usuarios) - Formato JSON
+- `tiquetes.json`: Cola de tiquetes pendientes de atención - Formato JSON
+- `atendidos.json`: Historial de tiquetes atendidos - Formato JSON
+- `colas.txt`: Estado de colas de buses (cantidad de personas por bus) - Formato TXT
 
-**Importante**: Si se elimina `config.json`, deberá reconfigurar el sistema.
+**Importante**: Si se elimina `config.json`, deberá reconfigurar el sistema. Los demás archivos se regeneran automáticamente si se eliminan.
 
 ## Documentación de Clases y Métodos
 
@@ -313,7 +362,7 @@ El sistema genera y utiliza los siguientes archivos JSON:
 - **Métodos principales**:
   - `encolar(NodoTiquete)`: Agrega tiquete ordenado por prioridad (P:3, D:2, N:1)
   - `desencolar()`: Remueve y retorna el tiquete del frente
-  - `crearTiquete()`: Crea nuevo tiquete solicitando datos al usuario
+  - `crearTiquete()`: Crea nuevo tiquete solicitando datos al usuario (ID se genera automáticamente)
   - `mostrarCola()`: Muestra todos los tiquetes en la cola
   - `verFrente()`: Retorna el tiquete del frente sin desencolarlo
   - `exportarTiquetes()`: Convierte cola a arreglo para serialización
@@ -330,18 +379,20 @@ El sistema genera y utiliza los siguientes archivos JSON:
   - `tipoBus`: Tipo de bus requerido (P/D/N)
 
 #### `PersistenciaCola`
-- **Propósito**: Serialización y deserialización de tiquetes
+- **Propósito**: Serialización y deserialización de tiquetes y gestión de colas de buses
 - **Métodos principales**:
   - `serializarCola(ColaPrioridad, String)`: Guarda cola en archivo JSON
   - `deserializarCola(String)`: Carga cola desde archivo JSON
-  - `gestionarTiquetes(ColaPrioridad, ModuloAtencionTiquetes)`: Menú de gestión de tiquetes
+  - `gestionarTiquetes(ColaPrioridad, ModuloAtencionTiquetes, AsignacionColas)`: Menú de gestión de tiquetes
+  - `guardarColas(AsignacionColas)`: Guarda estado de colas en `colas.txt`
+  - `cargarColas(AsignacionColas, GestionBuses)`: Carga estado de colas desde `colas.txt`
 
 #### `ModuloAtencionTiquetes`
 - **Propósito**: Gestión completa del proceso de atención de tiquetes (Módulo 1.2)
 - **Métodos principales**:
-  - `atenderDesdeMenu(ColaPrioridad)`: Atiende tiquete desde opción de menú
+  - `atenderDesdeMenu(ColaPrioridad, AsignacionColas)`: Atiende tiquete desde opción de menú
   - `mostrarHistorial()`: Muestra historial de atendidos
-  - `procesarAtencionDesdeCola(ColaPrioridad, boolean)`: Procesa atención completa
+  - `procesarAtencionDesdeCola(ColaPrioridad, boolean, AsignacionColas)`: Procesa atención completa
   - `calcularCobro(NodoTiquete)`: Calcula monto según tipo de servicio
   - `confirmarPago(NodoTiquete, double)`: Solicita confirmación de pago
   - `registrarAtendido(NodoTiquete, Bus, double)`: Registra atención en historial
@@ -372,6 +423,25 @@ El sistema genera y utiliza los siguientes archivos JSON:
 - **Propósito**: Entidad que representa un bus
 - **Atributos**: `idBus`, `tipo`, `estado` (Disponible/Atendiendo)
 
+#### `AsignacionColas` (Módulo 1.3)
+- **Propósito**: Gestiona la asignación de tiquetes a buses según reglas específicas
+- **Métodos principales**:
+  - `asignarTiquete(String)`: Asigna tiquete a bus según tipo (P/D/N) y reglas
+  - `decrementarCola(String)`: Decrementa cantidad en cola cuando se atiende tiquete
+  - `obtenerEstadoColas()`: Retorna estado actual de todas las colas
+  - `agregarBus(Bus, int)`: Agrega bus a la lista de colas
+  - `actualizarCantidadBus(String, int)`: Actualiza cantidad de un bus existente
+
+#### `NodoCola` (Módulo 1.3)
+- **Propósito**: Nodo para lista enlazada de colas de buses
+- **Atributos**: `bus`, `cantidad`, `siguiente`
+- **Uso**: Utilizado en `AsignacionColas` para mantener estado de colas
+
+#### `GestorIdPasajero`
+- **Propósito**: Utilidad para generar IDs autoincrementales de pasajeros
+- **Métodos principales**:
+  - `obtenerSiguienteId()`: Retorna el siguiente ID disponible basado en máximo existente
+
 ## Notas de Desarrollo
 
 - El sistema utiliza únicamente librerías básicas de Java y Gson para JSON
@@ -379,11 +449,13 @@ El sistema genera y utiliza los siguientes archivos JSON:
 - La implementación sigue principios de programación orientada a objetos
 - El código está documentado con comentarios explicativos
 - Se implementó manejo de errores básico para robustez del sistema
-- Se utiliza lista enlazada simple para el historial de atendidos
+- Se utiliza lista enlazada simple para el historial de atendidos y colas de buses
 - La atención al crear tiquete se hace por medio de control manual mediante opción "Abordar"
+- IDs de pasajeros se generan automáticamente para evitar duplicados
 
 ## Correcciones Realizadas en Esta Entrega
 
+### Correcciones Módulo 1.2
 - ✅ Corrección de persistencia de tiquetes en `tiquetes.json`
 - ✅ Implementación correcta de cálculo de cobros según tipo de servicio
 - ✅ Validación de pago antes de marcar tiquete como atendido
@@ -391,6 +463,18 @@ El sistema genera y utiliza los siguientes archivos JSON:
 - ✅ Integración completa del módulo 1.2 con menú de gestión
 - ✅ Persistencia automática después de cada operación
 - ✅ Visualización mejorada de cola y historial mediante JOptionPane
+
+### Correcciones Módulo 1.3
+- ✅ Integración completa del módulo 1.3 con módulos existentes
+- ✅ Corrección de duplicados en `colas.txt` (ahora actualiza cantidades en lugar de crear duplicados)
+- ✅ Asignación automática de tiquetes a buses al crear tiquete
+- ✅ Actualización automática de colas al atender tiquetes
+- ✅ Persistencia y carga correcta de colas desde `colas.txt`
+- ✅ Compatibilidad de códigos P/D/N con nombres completos en asignación
+
+### Mejoras Implementadas
+- ✅ **ID autoincremental:** Implementación de generación automática de IDs de pasajeros
+- ✅ **Gestión mejorada de colas:** Sistema robusto de actualización sin duplicados
 
 
 ---
