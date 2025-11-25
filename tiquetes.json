@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "nombre": "Gerald",
+    "id": 1,
+    "edad": 24,
+    "moneda": 0.0,
+    "horaCompra": "24/11/2025 19:40:27",
+    "horaAbordaje": "-1",
+    "servicio": "VIP",
+    "tipoBus": "P"
+  },
+  {
+    "nombre": "G",
+    "id": 2,
+    "edad": 22,
+    "moneda": 0.0,
+    "horaCompra": "24/11/2025 19:41:53",
+    "horaAbordaje": "-1",
+    "servicio": "Regular",
+    "tipoBus": "N"
+  }
+]

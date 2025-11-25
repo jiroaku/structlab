@@ -26,6 +26,11 @@ public class ConfiguracionSistema {
     // Constructor vacío para Gson
     public ConfiguracionSistema() {
     }
+    
+    // Constructor que permite inicializar solo el nombre de la terminal
+    public ConfiguracionSistema(String nombreTerminal) {
+        this.nombreTerminal = nombreTerminal;
+    }
 
     // Verificar si existe config.json
     public boolean existeConfiguracion() {
@@ -151,5 +156,5 @@ public class ConfiguracionSistema {
                "Directos: " + busesDirectos + "\n" +
                "Normales: " + busesNormales + "\n" +
                "Usuarios: " + usuario1 + ", " + usuario2;
-    }
+    }    
 }
