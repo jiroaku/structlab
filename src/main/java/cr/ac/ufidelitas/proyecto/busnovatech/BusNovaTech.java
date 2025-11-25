@@ -38,6 +38,19 @@ public class BusNovaTech {
         // Andrew - crea instancia del módulo 1.2 para atención de tiquetes
         ModuloAtencionTiquetes moduloAtencion = new ModuloAtencionTiquetes(config, gestorBuses);
 
+        // Luna - crea una isntancia del módulo 1.3 de llenado de colas
+        AsignacionColas colas = new AsignacionColas();
+
+        // Llenar colas con los buses existentes
+        NodoBus actual = gestorBuses.getPrimero();
+        while (actual != null) {
+            colas.agregarBus(actual.bus, 0);
+            actual = actual.siguiente;
+        }
+
+        // Guardar colas en colas.txt 
+        PersistenciaCola.guardarColas(colas);
+
         //Cargar cola de tiquetes
         ColaPrioridad cola = persistencia.deserializarCola("tiquetes.json");
 

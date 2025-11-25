@@ -1,4 +1,3 @@
-
 package cr.ac.ufidelitas.proyecto.busnovatech;
 
 /**
@@ -28,9 +27,7 @@ public class AsignacionColas {
         }
     }
 
-   
     //REGLA DE ASIGNACIÓN
-    
     public String asignarTiquete(String tipoTiquete) {
 
         tipoTiquete = tipoTiquete.toLowerCase();
@@ -83,10 +80,15 @@ public class AsignacionColas {
 
         while (actual != null) {
             texto += actual.bus.getIdBus() + " (" + actual.bus.getTipo() + ") → "
-                   + actual.cantidad + " personas\n";
+                    + actual.cantidad + " personas\n";
             actual = actual.siguiente;
         }
 
         return texto;
+    }
+    
+    //Luna
+    public NodoCola getPrimero() {
+        return primero;
     }
 }

@@ -1,4 +1,3 @@
-
 package cr.ac.ufidelitas.proyecto.busnovatech;
 
 /**
@@ -60,10 +59,6 @@ public class GestionBuses {
         }
     }
 
-
-
-
-
     private void insertarBus(Bus nuevoBus) {
         NodoBus nuevo = new NodoBus(nuevoBus);
         if (primero == null) {
@@ -76,7 +71,6 @@ public class GestionBuses {
             actual.siguiente = nuevo;
         }
     }
-
 
     public void cargarBusesDesdeConfig() {
         // Cargar configuración usando ConfiguracionSistema
@@ -98,9 +92,9 @@ public class GestionBuses {
         String texto = "Lista de buses registrados:\n\n";
         NodoBus actual = primero;
         while (actual != null) {
-            texto += "ID: " + actual.bus.getIdBus() +
-                     " | Tipo: " + actual.bus.getTipo() +
-                     " | Estado: " + actual.bus.getEstado() + "\n";
+            texto += "ID: " + actual.bus.getIdBus()
+                    + " | Tipo: " + actual.bus.getTipo()
+                    + " | Estado: " + actual.bus.getEstado() + "\n";
             actual = actual.siguiente;
         }
         JOptionPane.showMessageDialog(null, texto);
@@ -122,5 +116,25 @@ public class GestionBuses {
             actual = actual.siguiente;
         }
         return null;
+    }
+
+    // Busca un bus por su ID y lo devuelve - Luna
+    public Bus obtenerBusPorId(String idBus) {
+        if (idBus == null || primero == null) {
+            return null;
+        }
+
+        NodoBus actual = primero;
+        while (actual != null) {
+            if (actual.bus.getIdBus().equalsIgnoreCase(idBus)) {
+                return actual.bus;
+            }
+            actual = actual.siguiente;
+        }
+        return null;
+    }
+
+    public NodoBus getPrimero() {
+        return primero;
     }
 }
