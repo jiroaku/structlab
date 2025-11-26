@@ -21,9 +21,10 @@ BusNovaTech es un sistema de gestión inteligente para terminales de buses que i
 | **Samuel Alonso Mena Garro** | 1.0 | Gestión de buses |
 | **Samuel Alonso Mena Garro** | 1.3 | Lógica de asignación de tiquetes a buses |
 | **Gerald Obed Herra Fonseca** | 1.1 | Gestión de tiquetes |
+| **Gerald Obed Herra Fonseca** | 1.3 | Interfaz y validación de flujo |
 | **Luna Delgado Durango** | 1.1 | Integración de módulos, login y menú principal |
 | **Luna Delgado Durango** | 1.3 | Persistencia de colas (colas.txt) |
-| **Gerald Obed Herra Fonseca** | 1.3 | Interfaz y validación de flujo |
+
 
 ## Arquitectura del Sistema
 
@@ -45,7 +46,7 @@ BusNovaTech es un sistema de gestión inteligente para terminales de buses que i
 | `RegistroAtencion` | Representa un abordaje confirmado | Andrew |
 | `AsignacionColas` | Lógica de asignación de tiquetes a buses (Módulo 1.3) | Samuel |
 | `NodoCola` | Nodo para lista de colas de buses | Samuel |
-| `GestorIdPasajero` | Generación de IDs autoincrementales | Integración |
+| `GestorIdPasajero` | Generación de IDs autoincrementales | Gerald |
 
 ## Módulos Implementados
 
@@ -437,10 +438,12 @@ El sistema genera y utiliza los siguientes archivos:
 - **Atributos**: `bus`, `cantidad`, `siguiente`
 - **Uso**: Utilizado en `AsignacionColas` para mantener estado de colas
 
-#### `GestorIdPasajero`
+#### `GestorIdPasajero` (Implementado por Gerald)
 - **Propósito**: Utilidad para generar IDs autoincrementales de pasajeros
 - **Métodos principales**:
-  - `obtenerSiguienteId()`: Retorna el siguiente ID disponible basado en máximo existente
+  - `obtenerSiguienteId()`: Retorna el siguiente ID disponible basado en máximo existente en `tiquetes.json` y `atendidos.json`
+  - `obtenerMaxIdDesdeTiquetes()`: Busca el máximo ID en `tiquetes.json`
+  - `obtenerMaxIdDesdeAtendidos()`: Busca el máximo ID en `atendidos.json`
 
 ## Notas de Desarrollo
 
@@ -452,6 +455,9 @@ El sistema genera y utiliza los siguientes archivos:
 - Se utiliza lista enlazada simple para el historial de atendidos y colas de buses
 - La atención al crear tiquete se hace por medio de control manual mediante opción "Abordar"
 - IDs de pasajeros se generan automáticamente para evitar duplicados
+- **Integración del módulo 1.3:** Gerald integró las funcionalidades del módulo 1.3 en el menú principal de gestión de tiquetes, incluyendo la asignación automática de tiquetes a buses y la opción para ver el estado de las colas.
+- **GestorIdPasajero:** Implementado por Gerald para generar IDs autoincrementales de pasajeros, evitando duplicados y mejorando la experiencia de usuario.
+- **Integración módulo 1.3 con 1.2:** Implementada por Gerald, modificando `ModuloAtencionTiquetes` para que decremente las colas de buses cuando se atiende un tiquete, tanto si el pago es aceptado como rechazado.
 
 ## Correcciones Realizadas en Esta Entrega
 
@@ -471,10 +477,14 @@ El sistema genera y utiliza los siguientes archivos:
 - ✅ Actualización automática de colas al atender tiquetes
 - ✅ Persistencia y carga correcta de colas desde `colas.txt`
 - ✅ Compatibilidad de códigos P/D/N con nombres completos en asignación
+- ✅ **Integración del módulo 1.3:** Gerald integró las funcionalidades del módulo 1.3 en el menú principal de gestión de tiquetes, incluyendo la asignación automática de tiquetes a buses (opción 1) y la opción para ver el estado de las colas (opción 5).
+- ✅ **GestorIdPasajero:** Implementado por Gerald para generar IDs autoincrementales, evitando duplicados.
+- ✅ **Integración módulo 1.3 con 1.2:** Implementada por Gerald, conectando el decremento de colas cuando se atiende un tiquete.
 
 ### Mejoras Implementadas
-- ✅ **ID autoincremental:** Implementación de generación automática de IDs de pasajeros
+- ✅ **ID autoincremental:** Implementación de generación automática de IDs de pasajeros (Gerald - `GestorIdPasajero`)
 - ✅ **Gestión mejorada de colas:** Sistema robusto de actualización sin duplicados
+- ✅ **Integración módulo 1.3 con 1.2:** Decremento automático de colas al atender tiquetes (Gerald)
 
 
 ---

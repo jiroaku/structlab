@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
  *
  * @author @jiroaku
  */
-// Andrew - gestiona historial de tiquetes atendidos con lista enlazada y JSON
+// Andrew - historial de tiquetes atendidos con lista enlazada y JSON
 public class HistorialAtenciones {
 
     private Nodo<RegistroAtencion> primero;

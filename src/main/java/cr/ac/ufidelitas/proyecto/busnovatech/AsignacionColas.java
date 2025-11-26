@@ -104,7 +104,7 @@ public class AsignacionColas {
         }
     }
 
-    // Mostrar estado para Persona C
+    // Mostrar estado para Gerald
     public String obtenerEstadoColas() {
         String texto = "=== Estado de las colas ===\n";
         NodoCola actual = primero;

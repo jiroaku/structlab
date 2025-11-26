@@ -8,7 +8,7 @@ import java.io.FileReader;
  * Clase utilitaria para generar IDs autoincrementales de pasajeros
  * basándose en los IDs existentes en tiquetes.json y atendidos.json
  *
- * @author jiroaku
+ * @author gerald
  */
 public class GestorIdPasajero {
 

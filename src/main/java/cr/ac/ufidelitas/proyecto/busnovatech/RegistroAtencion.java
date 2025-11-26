@@ -16,11 +16,11 @@ public class RegistroAtencion {
     private String horaAtencion;
     private double montoCobrado;
 
-    // Andrew - constructor vacío para Gson
+    // Constructor vacío para Gson
     public RegistroAtencion() {
     }
 
-    // Andrew - constructor con todos los datos del registro de atención
+    // Constructor con todos los datos del registro de atención
     public RegistroAtencion(String nombrePasajero, int idPasajero, String servicio,
                             String tipoBus, String busAsignado, String terminal,
                             String horaAtencion, double montoCobrado) {
