@@ -10,7 +10,7 @@
 
 ## Descripción General Segunda Entrega
 
-BusNovaTech es un sistema de gestión inteligente para terminales de buses que implementa estructuras de datos dinámicas para la administración de buses, tiquetes y configuración del sistema. El proyecto desarrolla los módulos 1.0 (Configuración de Estructuras de Datos), 1.1 (Creación de Tiquetes), 1.2 (Atención de Tiquetes) y 1.3 (Llenado de las Colas) utilizando únicamente clases básicas de Java y manejo de archivos JSON/TXT.
+BusNovaTech es un sistema de gestión inteligente para terminales de buses que implementa estructuras de datos dinámicas para la administración de buses, tiquetes y configuración del sistema. El proyecto desarrolla los módulos 1.0 (Configuración de Estructuras de Datos), 1.1 (Creación de Tiquetes), 1.2 (Atención de Tiquetes), 1.3 (Llenado de las Colas) y 1.4 (Servicios Complementarios - Grafos) utilizando únicamente clases básicas de Java y manejo de archivos JSON/TXT.
 
 ## Equipo de Desarrollo
 
@@ -18,6 +18,7 @@ BusNovaTech es un sistema de gestión inteligente para terminales de buses que i
 |------------|--------|-----------------|
 | **Jeferson Andrew Fuentes García** | 1.0 | Configuración del sistema y persistencia |
 | **Jeferson Andrew Fuentes García** | 1.2 | Atención de tiquetes e historial |
+| **Jeferson Andrew Fuentes García** | 1.4 | Servicios complementarios (grafos) |
 | **Samuel Alonso Mena Garro** | 1.0 | Gestión de buses |
 | **Samuel Alonso Mena Garro** | 1.3 | Lógica de asignación de tiquetes a buses |
 | **Gerald Obed Herra Fonseca** | 1.1 | Gestión de tiquetes |
@@ -47,6 +48,11 @@ BusNovaTech es un sistema de gestión inteligente para terminales de buses que i
 | `AsignacionColas` | Lógica de asignación de tiquetes a buses (Módulo 1.3) | Samuel |
 | `NodoCola` | Nodo para lista de colas de buses | Samuel |
 | `GestorIdPasajero` | Generación de IDs autoincrementales | Gerald |
+| `GrafoRutas` | Grafo ponderado dirigido para rutas de buses (Módulo 1.4) | jiro |
+| `GestionGrafo` | Gestión del módulo 1.4 con menú y persistencia | jiro |
+| `Localidad` | Representa una localidad donde el bus pararía | jiro |
+| `VerticeGrafo` | Vértice del grafo con adyacentes usando arrays | jiro |
+| `AristaGrafo` | Arista con peso para el grafo ponderado | jiro |
 
 ## Módulos Implementados
 
@@ -151,6 +157,46 @@ Según la especificación, el módulo 1.2 contempla dos formas de atención:
 - **Módulo 1.2:** Al atender un tiquete (pago aceptado o rechazado), se decrementa la cola del bus correspondiente
 - **Persistencia:** Las colas se guardan en `colas.txt` al cerrar el sistema y se cargan al iniciar
 
+### Módulo 1.4 - Servicios Complementarios
+
+**Objetivo:** Implementar un grafo ponderado dirigido para definir rutas entre localidades y calcular la ruta más corta entre terminales.
+
+#### Funcionalidades Implementadas
+
+| Funcionalidad | Descripción | Estado |
+|---------------|-------------|--------|
+| Grafo ponderado dirigido | Implementación de grafo con pesos en las aristas | ✅ |
+| Definición de localidades | Gestión de localidades donde el bus pararía (desde ejecución) | ✅ |
+| Definición de rutas | Agregar rutas entre localidades con pesos (desde ejecución) | ✅ |
+| Impresión del grafo | Visualización completa del grafo con localidades y pesos | ✅ |
+| Ruta más corta | Cálculo de ruta más corta entre dos localidades usando Dijkstra | ✅ |
+| Persistencia JSON | Guardado y carga del grafo en `grafo.json` | ✅ |
+| Menú de gestión | Interfaz para gestionar localidades y rutas | ✅ |
+
+#### Estructura del Grafo
+
+- **Localidades:** Representan terminales o paradas donde el bus puede detenerse
+  - Cada localidad tiene un ID único y un nombre
+  - Se definen desde la ejecución del programa mediante el menú
+- **Rutas:** Representan conexiones dirigidas entre localidades
+  - Cada ruta tiene un peso
+  - Las rutas son unidireccionales (grafo dirigido)
+  - Se definen desde la ejecución del programa mediante el menú
+
+#### Algoritmo de Ruta Más Corta
+
+El módulo implementa el algoritmo de Dijkstra para encontrar la ruta más corta entre dos localidades:
+- Utiliza solo estructuras básicas (arrays) sin HashMap, PriorityQueue o ArrayList
+- Calcula el peso mínimo y reconstruye el camino completo
+- Muestra la ruta paso a paso y el peso total
+
+#### Integración con el Sistema
+
+- **Menú Principal:** Opción "Servicios complementarios (Grafos)" en el menú principal
+- **Persistencia:** El grafo se guarda automáticamente en `grafo.json` al modificar
+- **Carga automática:** El grafo se carga al iniciar el sistema
+- **Gratuito:** Este servicio no se cobra al cliente según especificación
+
 ## Sistema de Prioridades
 
 La cola de prioridad implementada organiza los tiquetes según el siguiente criterio:
@@ -176,7 +222,7 @@ La cola de prioridad implementada organiza los tiquetes según el siguiente crit
 - **Maven:** Gestión de dependencias y construcción
 - **Gson 2.8.9:** Serialización/deserialización JSON
 - **Swing (JOptionPane):** Interfaz de usuario
-- **Estructuras de Datos:** Listas enlazadas y colas de prioridad
+- **Estructuras de Datos:** Listas enlazadas, colas de prioridad y grafos ponderados dirigidos
 
 ## Estructura de Archivos
 
@@ -196,7 +242,12 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 ├── RegistroAtencion.java       # Módulo 1.2 - Registro de atención
 ├── AsignacionColas.java        # Módulo 1.3 - Lógica de asignación de tiquetes
 ├── NodoCola.java               # Módulo 1.3 - Nodo para colas de buses
-└── GestorIdPasajero.java       # Utilidad - Generación de IDs autoincrementales
+├── GestorIdPasajero.java       # Utilidad - Generación de IDs autoincrementales
+├── GrafoRutas.java             # Módulo 1.4 - Grafo ponderado dirigido
+├── GestionGrafo.java           # Módulo 1.4 - Gestión del grafo con menú
+├── Localidad.java              # Módulo 1.4 - Localidad donde el bus pararía
+├── VerticeGrafo.java           # Módulo 1.4 - Vértice del grafo
+└── AristaGrafo.java            # Módulo 1.4 - Arista con peso
 ```
 
 ## Archivos de Datos
@@ -207,6 +258,7 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 | `tiquetes.json` | Cola de tiquetes persistente | JSON |
 | `atendidos.json` | Historial de tiquetes abordados | JSON |
 | `colas.txt` | Estado de colas de buses (cantidad de personas por bus) | TXT |
+| `grafo.json` | Grafo de rutas entre localidades | JSON |
 
 
 ## Características Técnicas
@@ -214,6 +266,7 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 ### Estructuras de Datos Implementadas
 - **Lista Enlazada:** Para gestión de buses y colas de buses
 - **Cola de Prioridad:** Para organización de tiquetes
+- **Grafos Ponderados Dirigidos:** Para rutas entre localidades usando arrays
 - **Nodos Genéricos:** Para flexibilidad en estructuras
 
 ### Patrones de Diseño
@@ -278,14 +331,18 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 - ✅ Visualización del estado de todas las colas mediante opción de menú
 - ✅ Integración completa con módulos 1.1 y 1.2
 
-## Requerimientos Pendientes
+### Módulo 1.4 - Servicios Complementarios ✅
+- ✅ Implementación de grafo ponderado dirigido usando arrays
+- ✅ Definición de localidades donde el bus pararía (desde ejecución)
+- ✅ Definición de rutas entre localidades con pesos (desde ejecución)
+- ✅ Impresión del grafo construido con localidades y pesos de rutas
+- ✅ Cálculo de ruta más corta entre dos localidades usando algoritmo de Dijkstra
+- ✅ Persistencia del grafo en `grafo.json`
+- ✅ Carga automática del grafo al iniciar el sistema
+- ✅ Menú de gestión para agregar localidades y rutas
+- ✅ Integración en el menú principal del sistema
 
-### Módulo 1.4 - Servicios Complementarios ⏳
-- ⏳ Implementación de grafo ponderado dirigido
-- ⏳ Definición de localidades y rutas
-- ⏳ Impresión del grafo construido
-- ⏳ Cálculo de ruta más corta entre terminales
-- ⏳ Persistencia en `grafo.json`
+## Requerimientos Pendientes
 
 ### Módulo 1.5 - Consulta BCCR ⏳
 - ⏳ Integración con Web Service del Banco Central de Costa Rica
@@ -298,7 +355,7 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 **Módulo 1.1:** ✅ Completado
 **Módulo 1.2:** ✅ Completado
 **Módulo 1.3:** ✅ Completado
-**Módulo 1.4:** ⏳ Pendiente
+**Módulo 1.4:** ✅ Completado
 **Módulo 1.5:** ⏳ Pendiente
 **Integración:** ✅ Completada
 **Persistencia:** ✅ Implementada
@@ -330,6 +387,7 @@ El sistema genera y utiliza los siguientes archivos:
 - `tiquetes.json`: Cola de tiquetes pendientes de atención - Formato JSON
 - `atendidos.json`: Historial de tiquetes atendidos - Formato JSON
 - `colas.txt`: Estado de colas de buses (cantidad de personas por bus) - Formato TXT
+- `grafo.json`: Grafo de rutas entre localidades - Formato JSON
 
 **Importante**: Si se elimina `config.json`, deberá reconfigurar el sistema. Los demás archivos se regeneran automáticamente si se eliminan.
 
@@ -445,6 +503,41 @@ El sistema genera y utiliza los siguientes archivos:
   - `obtenerMaxIdDesdeTiquetes()`: Busca el máximo ID en `tiquetes.json`
   - `obtenerMaxIdDesdeAtendidos()`: Busca el máximo ID en `atendidos.json`
 
+#### `GrafoRutas` (Módulo 1.4 - Implementado por jiro)
+- **Propósito**: Grafo ponderado dirigido para representar rutas entre localidades usando arrays
+- **Métodos principales**:
+  - `agregarVertice(Localidad)`: Agrega una localidad al grafo
+  - `agregarArista(Localidad, Localidad, int)`: Agrega una ruta dirigida con peso
+  - `imprimir()`: Retorna representación en texto del grafo completo
+  - `rutaMasCorta(Localidad, Localidad)`: Calcula y retorna la ruta más corta usando Dijkstra
+  - `obtenerArrayLocalidades()`: Retorna array de localidades
+  - `obtenerVertices()`: Retorna array de vértices para serialización
+  - `cargarVertices(VerticeGrafo[])`: Carga vértices desde array
+
+#### `GestionGrafo` (Módulo 1.4 - Implementado por jiro)
+- **Propósito**: Gestión completa del módulo 1.4 con menú y persistencia
+- **Métodos principales**:
+  - `gestionarGrafo()`: Menú principal del módulo de grafos
+  - `guardarGrafo()`: Guarda el grafo en `grafo.json`
+  - `cargarGrafo()`: Carga el grafo desde `grafo.json`
+  - `agregarLocalidad()`: Permite agregar localidades desde el menú
+  - `agregarRuta()`: Permite agregar rutas desde el menú
+  - `consultarRutaMasCorta()`: Consulta la ruta más corta entre dos localidades
+
+#### `Localidad` (Módulo 1.4 - Implementado por jiro)
+- **Propósito**: Representa una localidad donde el bus puede parar
+- **Atributos**: `id`, `nombre`
+
+#### `VerticeGrafo` (Módulo 1.4 - Implementado por jiro)
+- **Propósito**: Vértice del grafo con array de adyacentes
+- **Atributos**: `valor` (Localidad), `adyacentes` (array de AristaGrafo), `cantidadAristas` (int)
+- **Métodos principales**:
+  - `agregarArista(AristaGrafo)`: Agrega una arista al vértice
+
+#### `AristaGrafo` (Módulo 1.4 - Implementado por jiro)
+- **Propósito**: Arista con peso para el grafo ponderado
+- **Atributos**: `destino` (Localidad), `peso` (int)
+
 ## Notas de Desarrollo
 
 - El sistema utiliza únicamente librerías básicas de Java y Gson para JSON
@@ -480,6 +573,7 @@ El sistema genera y utiliza los siguientes archivos:
 - ✅ **Integración del módulo 1.3:** Gerald integró las funcionalidades del módulo 1.3 en el menú principal de gestión de tiquetes, incluyendo la asignación automática de tiquetes a buses (opción 1) y la opción para ver el estado de las colas (opción 5).
 - ✅ **GestorIdPasajero:** Implementado por Gerald para generar IDs autoincrementales, evitando duplicados.
 - ✅ **Integración módulo 1.3 con 1.2:** Implementada por Gerald, conectando el decremento de colas cuando se atiende un tiquete.
+- ✅ **Módulo 1.4 - Servicios Complementarios:** Implementado por jiro (Jeferson Andrew Fuentes García), incluyendo grafo ponderado dirigido usando arrays, algoritmo de Dijkstra para ruta más corta, definición de localidades y rutas desde ejecución, persistencia en `grafo.json` e integración en el menú principal.
 
 ### Mejoras Implementadas
 - ✅ **ID autoincremental:** Implementación de generación automática de IDs de pasajeros (Gerald - `GestorIdPasajero`)

@@ -41,6 +41,9 @@ public class BusNovaTech {
         // Luna - crea una instancia del módulo 1.3 de llenado de colas
         AsignacionColas colas = new AsignacionColas();
 
+        // jiro - crea instancia del módulo 1.4 para servicios complementarios (grafos)
+        GestionGrafo gestionGrafo = new GestionGrafo();
+
         // Llenar colas con los buses existentes (inicialmente con cantidad 0)
         NodoBus actual = gestorBuses.getPrimero();
         while (actual != null) {
@@ -125,7 +128,7 @@ public class BusNovaTech {
         int opcion;
 
         do {
-            String[] opciones = {"Ver configuración", "Gestionar buses", "Gestionar tiquetes", "Salir"};
+            String[] opciones = {"Ver configuración", "Gestionar buses", "Gestionar tiquetes", "Servicios complementarios", "Salir"};
             opcion = JOptionPane.showOptionDialog(
                     null,
                     "Seleccione una opción para continuar:",
@@ -150,6 +153,9 @@ public class BusNovaTech {
                     persistencia.gestionarTiquetes(cola, moduloAtencion, colas);
                     break;
                 case 3:
+                    gestionGrafo.gestionarGrafo();
+                    break;
+                case 4:
                     JOptionPane.showMessageDialog(null,
                             "Guardando información...\n\nGracias por usar BusNovaTec!!",
                             "BusNovaTech - Cierre del sistema",
@@ -157,12 +163,14 @@ public class BusNovaTech {
                     persistencia.serializarCola(cola, "tiquetes.json");
                     // Guardar estado de colas antes de salir
                     PersistenciaCola.guardarColas(colas);
+                    // Guardar grafo antes de salir
+                    gestionGrafo.guardarGrafo();
                     break;
                 default:
                     break;
             }
 
-        } while (opcion != 3);
+        } while (opcion != 4);
 
         JOptionPane.showMessageDialog(null,
                 "¡Hasta pronto, usuario BusNovaTech!\n\nEsperamos volver a verte...",
