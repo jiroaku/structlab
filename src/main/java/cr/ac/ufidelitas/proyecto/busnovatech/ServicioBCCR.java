@@ -40,10 +40,6 @@ public class ServicioBCCR {
         CompletableFuture<HttpResponse<String>> responseFuture = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
         HttpResponse<String> response = responseFuture.join();
 
-        // Imprime status
-        System.out.println("Código de estado: " + response.statusCode());
-        System.out.println("Respuesta: " + response.body());
-
         if (response.statusCode() == 200) {
             try (InputStream inputStream = new ByteArrayInputStream(response.body().getBytes())) {
                 JAXBContext jaxbContext = JAXBContext.newInstance(IndicadorEconomico.class);
@@ -54,4 +50,33 @@ public class ServicioBCCR {
             throw new Exception("Error en la solicitud: " + response.statusCode());
         }
     }
+
+    public double obtenerTipoCambioVenta() throws Exception {
+        IndicadorEconomico indicador = obtenerIndicador(
+                "318", // Indicador venta dólar
+                "15/12/2025",
+                "16/12/2025",
+                "Luna Delgado",
+                "N",
+                "luna.dd26@gmail.com",
+                "9L2D52D2L5"
+        );
+
+        if (indicador == null
+                || indicador.getDiffgram() == null
+                || indicador.getDiffgram().getDatosDeIndicadores() == null
+                || indicador.getDiffgram().getDatosDeIndicadores().getIndicadores() == null
+                || indicador.getDiffgram().getDatosDeIndicadores().getIndicadores().isEmpty()) {
+
+            throw new Exception("No se pudo obtener el tipo de cambio del BCCR");
+        }
+
+        return indicador.getDiffgram()
+                .getDatosDeIndicadores()
+                .getIndicadores()
+                .get(0)
+                .getValor()
+                .doubleValue();
+    }
+
 }

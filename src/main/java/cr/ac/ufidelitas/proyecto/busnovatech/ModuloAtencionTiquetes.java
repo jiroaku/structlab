@@ -22,7 +22,6 @@ public class ModuloAtencionTiquetes {
         this.historial = new HistorialAtenciones();
     }
 
-
     // Atiende tiquete desde opción 3 del menú de gestión
     public void atenderDesdeMenu(ColaPrioridad cola, AsignacionColas colas) {
         if (cola == null || cola.estaVacia()) {
@@ -82,6 +81,23 @@ public class ModuloAtencionTiquetes {
             return;
         }
 
+        // Luna - Agregado del Módulo 1.2, cálculo con el consumo en línea del web service del Banco Central.
+        double tipoCambio;
+        double montoCRC;
+
+        try {
+            ServicioBCCR bccr = new ServicioBCCR();
+            tipoCambio = bccr.obtenerTipoCambioVenta();
+            montoCRC = monto * tipoCambio;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,
+                    "No se pudo obtener el tipo de cambio del BCCR.\nIntente más tarde.",
+                    "Error BCCR",
+                    JOptionPane.ERROR_MESSAGE);
+            busDisponible.setEstado("Disponible");
+            return;
+        }
+        
         String horaSistema = obtenerHoraSistema();
         tiqueteAtender.setHoraAbordaje(horaSistema);
         tiqueteAtender.setMoneda(monto);
@@ -180,7 +196,7 @@ public class ModuloAtencionTiquetes {
     }
 
     // Solicita confirmación de pago mediante diálogo YES/NO
-    private boolean confirmarPago(NodoTiquete tiquete, double monto) {
+    private boolean confirmarPago(NodoTiquete tiquete, double monto, double tipoCambio) {
         String nombre = "Pasajero";
         String servicio = "Regular";
         if (tiquete != null) {
@@ -191,8 +207,12 @@ public class ModuloAtencionTiquetes {
                 servicio = tiquete.getServicio();
             }
         }
+        
+        double montoCRC = monto * tipoCambio;
+        
         String mensaje = "Servicio: " + servicio
-                + "\nMonto a cancelar: $" + monto
+                + "\nMonto a cancelar USD: $" + monto
+                + "\nMonto a cancelar CRC: ₡" + montoCRC
                 + "\n\n¿El pasajero " + nombre + " acepta el cobro?";
         int respuesta = JOptionPane.showConfirmDialog(null, mensaje,
                 "Cobro del servicio", JOptionPane.YES_NO_OPTION);
@@ -224,4 +244,3 @@ public class ModuloAtencionTiquetes {
         historial.agregarRegistro(registro);
     }
 }
-
