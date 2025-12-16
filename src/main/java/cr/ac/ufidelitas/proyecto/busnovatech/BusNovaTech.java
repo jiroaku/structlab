@@ -44,6 +44,9 @@ public class BusNovaTech {
         // jiro - crea instancia del módulo 1.4 para servicios complementarios (grafos)
         GestionGrafo gestionGrafo = new GestionGrafo();
 
+        // Luna - módulo 1.5 consulta BCCR
+        GestionTipoCambio gestionTipoCambio = new GestionTipoCambio();
+
         // Llenar colas con los buses existentes (inicialmente con cantidad 0)
         NodoBus actual = gestorBuses.getPrimero();
         while (actual != null) {
@@ -153,7 +156,38 @@ public class BusNovaTech {
                     persistencia.gestionarTiquetes(cola, moduloAtencion, colas);
                     break;
                 case 3:
-                    gestionGrafo.gestionarGrafo();
+                    // Luna - Submenu con los servicios complementarios
+                    int opcionServicio;
+                    do {
+                        String[] servicios = {
+                            "Servicios de rutas (Grafo)",
+                            "Consulta tipo de cambio (BCCR)",
+                            "Volver al menú principal"
+                        };
+
+                        opcionServicio = JOptionPane.showOptionDialog(
+                                null,
+                                "Seleccione un servicio complementario:",
+                                "BusNovaTech - Servicios Complementarios",
+                                JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.INFORMATION_MESSAGE,
+                                null,
+                                servicios,
+                                servicios[0]
+                        );
+
+                        switch (opcionServicio) {
+                            case 0:
+                                gestionGrafo.gestionarGrafo(); // Módulo 1.4
+                                break;
+                            case 1:
+                                gestionTipoCambio.consultarTipoCambio(); // Módulo 1.5
+                                break;
+                            default:
+                                break;
+                        }
+
+                    } while (opcionServicio != 2);
                     break;
                 case 4:
                     JOptionPane.showMessageDialog(null,
