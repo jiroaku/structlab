@@ -64,7 +64,25 @@ public class ModuloAtencionTiquetes {
         busDisponible.setEstado("Atendiendo");
 
         double monto = calcularCobro(tiqueteAtender);
-        boolean pagoAceptado = confirmarPago(tiqueteAtender, monto);
+
+        // Luna - cálculo con el consumo en línea del web service del Banco Central antes de cobrar
+        double tipoCambio;
+        double montoCRC;
+
+        try {
+            ServicioBCCR bccr = new ServicioBCCR();
+            tipoCambio = bccr.obtenerTipoCambioVenta();
+            montoCRC = monto * tipoCambio;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,
+                    "No se pudo obtener el tipo de cambio del BCCR.\nIntente más tarde.",
+                    "Error BCCR",
+                    JOptionPane.ERROR_MESSAGE);
+            busDisponible.setEstado("Disponible");
+            return;
+        }
+
+        boolean pagoAceptado = confirmarPago(tiqueteAtender, monto, tipoCambio);
 
         if (!pagoAceptado) {
             busDisponible.setEstado("Disponible");
@@ -81,23 +99,6 @@ public class ModuloAtencionTiquetes {
             return;
         }
 
-        // Luna - Agregado del Módulo 1.2, cálculo con el consumo en línea del web service del Banco Central.
-        double tipoCambio;
-        double montoCRC;
-
-        try {
-            ServicioBCCR bccr = new ServicioBCCR();
-            tipoCambio = bccr.obtenerTipoCambioVenta();
-            montoCRC = monto * tipoCambio;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,
-                    "No se pudo obtener el tipo de cambio del BCCR.\nIntente más tarde.",
-                    "Error BCCR",
-                    JOptionPane.ERROR_MESSAGE);
-            busDisponible.setEstado("Disponible");
-            return;
-        }
-        
         String horaSistema = obtenerHoraSistema();
         tiqueteAtender.setHoraAbordaje(horaSistema);
         tiqueteAtender.setMoneda(monto);
@@ -114,7 +115,9 @@ public class ModuloAtencionTiquetes {
         String mensaje = "Tiquete atendido correctamente.\n"
                 + "Pasajero: " + tiqueteAtender.getNombre() + "\n"
                 + "Bus asignado: " + busDisponible.getIdBus() + "\n"
-                + "Hora de abordaje: " + horaSistema;
+                + "Hora de abordaje: " + horaSistema + "\n"
+                + "Monto cancelado USD: $" + monto + "\n"
+                + "Monto cancelado CRC: ₡" + montoCRC;
 
         if (esAutomatico) {
             JOptionPane.showMessageDialog(null, mensaje,

@@ -8,5 +8,15 @@
     "terminal": "nova",
     "horaAtencion": "24/11/2025 13:09:13",
     "montoCobrado": 100.0
+  },
+  {
+    "nombrePasajero": "Gerald",
+    "idPasajero": 1,
+    "servicio": "VIP",
+    "tipoBus": "Preferencial",
+    "busAsignado": "P1",
+    "terminal": "nova",
+    "horaAtencion": "16/12/2025 03:54:56",
+    "montoCobrado": 100.0
   }
 ]
