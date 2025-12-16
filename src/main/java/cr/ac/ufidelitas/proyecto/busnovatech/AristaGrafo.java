@@ -2,7 +2,7 @@ package cr.ac.ufidelitas.proyecto.busnovatech;
 
 /**
  *
- * @author jiro
+ * @author gerald
  */
 // Arista con peso para el grafo ponderado
 public class AristaGrafo {

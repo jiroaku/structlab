@@ -41,7 +41,7 @@ public class BusNovaTech {
         // Luna - crea una instancia del módulo 1.3 de llenado de colas
         AsignacionColas colas = new AsignacionColas();
 
-        // jiro - crea instancia del módulo 1.4 para servicios complementarios (grafos)
+        // gerald - crea instancia del módulo 1.4 para servicios complementarios (grafos)
         GestionGrafo gestionGrafo = new GestionGrafo();
 
         // Luna - módulo 1.5 consulta BCCR

@@ -2,7 +2,7 @@ package cr.ac.ufidelitas.proyecto.busnovatech;
 
 /**
  *
- * @author jiro
+ * @author samim
  */
 // Localidad donde el bus pararía
 public class Localidad {
