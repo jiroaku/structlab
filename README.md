@@ -667,4 +667,4 @@ El sistema genera y utiliza los siguientes archivos:
 ---
 
 **Desarrollado para el curso de Estructuras de Datos - Universidad Fidélitas**
-**Semestre 2024 - Grupo 6**
+**Tercer Cuatrimestre 2025 - Grupo 6**
