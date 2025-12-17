@@ -1,12 +1,1 @@
-[
-  {
-    "nombre": "G",
-    "id": 2,
-    "edad": 22,
-    "moneda": 0.0,
-    "horaCompra": "24/11/2025 19:41:53",
-    "horaAbordaje": "-1",
-    "servicio": "Regular",
-    "tipoBus": "N"
-  }
-]
+[]

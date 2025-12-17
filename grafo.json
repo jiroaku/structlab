@@ -1,1 +1,71 @@
-[]
+[
+  {
+    "valor": {
+      "nombre": "san josé",
+      "id": 1
+    },
+    "adyacentes": [
+      {
+        "destino": {
+          "nombre": "cartago",
+          "id": 2
+        },
+        "peso": 25
+      },
+      {
+        "destino": {
+          "nombre": "heredia",
+          "id": 3
+        },
+        "peso": 15
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "cantidadAristas": 2
+  },
+  {
+    "valor": {
+      "nombre": "cartago",
+      "id": 2
+    },
+    "adyacentes": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "cantidadAristas": 0
+  },
+  {
+    "valor": {
+      "nombre": "heredia",
+      "id": 3
+    },
+    "adyacentes": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "cantidadAristas": 0
+  }
+]

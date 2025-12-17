@@ -10,7 +10,7 @@
 
 ## Descripción General Segunda Entrega
 
-BusNovaTech es un sistema de gestión inteligente para terminales de buses que implementa estructuras de datos dinámicas para la administración de buses, tiquetes y configuración del sistema. El proyecto desarrolla los módulos 1.0 (Configuración de Estructuras de Datos), 1.1 (Creación de Tiquetes), 1.2 (Atención de Tiquetes), 1.3 (Llenado de las Colas) y 1.4 (Servicios Complementarios - Grafos) utilizando únicamente clases básicas de Java y manejo de archivos JSON/TXT.
+BusNovaTech es un sistema de gestión inteligente para terminales de buses que implementa estructuras de datos dinámicas para la administración de buses, tiquetes y configuración del sistema. El proyecto desarrolla los módulos 1.0 (Configuración de Estructuras de Datos), 1.1 (Creación de Tiquetes), 1.2 (Atención de Tiquetes), 1.3 (Llenado de las Colas), 1.4 (Servicios Complementarios - Grafos) y 1.5 (Consulta de Tipo de Cambio BCCR) utilizando únicamente clases básicas de Java y manejo de archivos JSON/TXT.
 
 ## Equipo de Desarrollo
 
@@ -21,10 +21,13 @@ BusNovaTech es un sistema de gestión inteligente para terminales de buses que i
 | **Jeferson Andrew Fuentes García** | 1.4 | Servicios complementarios (grafos) |
 | **Samuel Alonso Mena Garro** | 1.0 | Gestión de buses |
 | **Samuel Alonso Mena Garro** | 1.3 | Lógica de asignación de tiquetes a buses |
+| **Samuel Alonso Mena Garro** | 1.3 | Servicios complementarios (grafos) |
 | **Gerald Obed Herra Fonseca** | 1.1 | Gestión de tiquetes |
 | **Gerald Obed Herra Fonseca** | 1.3 | Interfaz y validación de flujo |
+| **Gerald Obed Herra Fonseca** | 1.3 | Servicios complementarios (grafos) |
 | **Luna Delgado Durango** | 1.1 | Integración de módulos, login y menú principal |
 | **Luna Delgado Durango** | 1.3 | Persistencia de colas (colas.txt) |
+| **Luna Delgado Durango** | 1.5 | Consulta de tipo de cambio BCCR |
 
 
 ## Arquitectura del Sistema
@@ -48,11 +51,15 @@ BusNovaTech es un sistema de gestión inteligente para terminales de buses que i
 | `AsignacionColas` | Lógica de asignación de tiquetes a buses (Módulo 1.3) | Samuel |
 | `NodoCola` | Nodo para lista de colas de buses | Samuel |
 | `GestorIdPasajero` | Generación de IDs autoincrementales | Gerald |
-| `GrafoRutas` | Grafo ponderado dirigido para rutas de buses (Módulo 1.4) | jiro |
-| `GestionGrafo` | Gestión del módulo 1.4 con menú y persistencia | jiro |
-| `Localidad` | Representa una localidad donde el bus pararía | jiro |
-| `VerticeGrafo` | Vértice del grafo con adyacentes usando arrays | jiro |
-| `AristaGrafo` | Arista con peso para el grafo ponderado | jiro |
+| `GrafoRutas` | Grafo ponderado dirigido para rutas de buses (Módulo 1.4) | Andrew |
+| `GestionGrafo` | Gestión del módulo 1.4 con menú y persistencia | Andrew |
+| `Localidad` | Representa una localidad donde el bus pararía | Samuel |
+| `VerticeGrafo` | Vértice del grafo con adyacentes usando arrays | Samuel |
+| `AristaGrafo` | Arista con peso para el grafo ponderado | Gerald |
+| `ServicioBCCR` | Consumo del Web Service del BCCR para tipo de cambio (Módulo 1.5) | Luna |
+| `IndicadorEconomico` | Estructura XML de respuesta del BCCR (Módulo 1.5) | Luna |
+| `GestionTipoCambio` | Gestión de consulta de tipo de cambio (Módulo 1.5) | Luna |
+
 
 ## Módulos Implementados
 
@@ -197,6 +204,53 @@ El módulo implementa el algoritmo de Dijkstra para encontrar la ruta más corta
 - **Carga automática:** El grafo se carga al iniciar el sistema
 - **Gratuito:** Este servicio no se cobra al cliente según especificación
 
+### Módulo 1.5 - Consulta de Tipo de Cambio BCCR
+
+**Objetivo:** Integrar la consulta en línea del tipo de cambio del dólar desde el Web Service del Banco Central de Costa Rica (BCCR) y utilizarlo en el cálculo de cobros.
+
+#### Funcionalidades Implementadas
+
+| Funcionalidad | Descripción | Estado |
+|---------------|-------------|--------|
+| Integración con Web Service BCCR | Consumo del servicio web del BCCR para obtener tipo de cambio | ✅ |
+| Consulta de tipo de cambio | Obtención del tipo de cambio de venta del dólar en tiempo real | ✅ |
+| Conversión de montos | Cálculo automático de montos en colones (CRC) usando tipo de cambio | ✅ |
+| Integración en cobros | Uso del tipo de cambio al atender tiquetes (Módulo 1.2) | ✅ |
+| Consulta manual | Opción de menú para consultar el tipo de cambio actual | ✅ |
+| Manejo de errores | Gestión de errores cuando el servicio BCCR no está disponible | ✅ |
+
+#### Estructura del Módulo
+
+- **ServicioBCCR:** Clase que consume el Web Service del BCCR
+  - Realiza peticiones HTTP POST al servicio del Banco Central
+  - Deserializa la respuesta XML usando JAXB
+  - Obtiene el tipo de cambio de venta (indicador 318)
+- **IndicadorEconomico:** Clase que representa la estructura XML de respuesta del BCCR
+  - Mapea la estructura completa del XML recibido
+  - Utiliza anotaciones JAXB para deserialización
+- **GestionTipoCambio:** Clase que gestiona la consulta del tipo de cambio
+  - Proporciona interfaz para consultar el tipo de cambio
+  - Muestra el resultado al usuario mediante JOptionPane
+
+#### Integración con el Sistema
+
+- **Módulo 1.2 (Atención de Tiquetes):** Al atender un tiquete, se consulta automáticamente el tipo de cambio del BCCR y se calcula el monto en colones (CRC) multiplicando el monto en dólares por el tipo de cambio
+- **Menú Principal:** Opción "Consulta tipo de cambio (BCCR)" disponible en el menú principal para consulta manual
+- **Cálculo de Cobros:** El sistema muestra tanto el monto en dólares como el equivalente en colones al confirmar el pago
+- **Manejo de Errores:** Si el servicio BCCR no está disponible, se muestra un mensaje de error y se cancela la atención del tiquete
+
+#### Detalles Técnicos
+
+- **Web Service:** `https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx/ObtenerIndicadoresEconomicos`
+- **Indicador:** 318 (Tipo de cambio de venta del dólar)
+- **Formato de respuesta:** XML
+- **Deserialización:** JAXB (Java Architecture for XML Binding)
+- **Comunicación:** HTTP POST con HttpClient de Java
+
+#### Nota de Implementación
+
+El módulo utiliza las credenciales del desarrollador (Luna Delgado) para acceder al servicio del BCCR. En un entorno de producción, estas credenciales deberían configurarse de forma segura.
+
 ## Sistema de Prioridades
 
 La cola de prioridad implementada organiza los tiquetes según el siguiente criterio:
@@ -247,7 +301,10 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 ├── GestionGrafo.java           # Módulo 1.4 - Gestión del grafo con menú
 ├── Localidad.java              # Módulo 1.4 - Localidad donde el bus pararía
 ├── VerticeGrafo.java           # Módulo 1.4 - Vértice del grafo
-└── AristaGrafo.java            # Módulo 1.4 - Arista con peso
+├── AristaGrafo.java            # Módulo 1.4 - Arista con peso
+├── ServicioBCCR.java           # Módulo 1.5 - Consumo del Web Service del BCCR
+├── IndicadorEconomico.java     # Módulo 1.5 - Estructura XML de respuesta del BCCR
+└── GestionTipoCambio.java      # Módulo 1.5 - Gestión de consulta de tipo de cambio
 ```
 
 ## Archivos de Datos
@@ -342,12 +399,14 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 - ✅ Menú de gestión para agregar localidades y rutas
 - ✅ Integración en el menú principal del sistema
 
-## Requerimientos Pendientes
-
-### Módulo 1.5 - Consulta BCCR ⏳
-- ⏳ Integración con Web Service del Banco Central de Costa Rica
-- ⏳ Consulta de tipo de cambio del dólar en línea
-- ⏳ Integración del tipo de cambio en el cálculo de cobros
+### Módulo 1.5 - Consulta de Tipo de Cambio BCCR ✅
+- ✅ Integración con Web Service del Banco Central de Costa Rica
+- ✅ Consulta de tipo de cambio del dólar en línea (indicador 318)
+- ✅ Integración del tipo de cambio en el cálculo de cobros (Módulo 1.2)
+- ✅ Conversión automática de montos en dólares a colones (CRC)
+- ✅ Opción de menú para consulta manual del tipo de cambio
+- ✅ Manejo de errores cuando el servicio BCCR no está disponible
+- ✅ Deserialización XML usando JAXB
 
 ## Estado del Proyecto
 
@@ -356,7 +415,7 @@ src/main/java/cr/ac/ufidelitas/proyecto/busnovatech/
 **Módulo 1.2:** ✅ Completado
 **Módulo 1.3:** ✅ Completado
 **Módulo 1.4:** ✅ Completado
-**Módulo 1.5:** ⏳ Pendiente
+**Módulo 1.5:** ✅ Completado
 **Integración:** ✅ Completada
 **Persistencia:** ✅ Implementada
 **Interfaz de Usuario:** ✅ Funcional
@@ -503,7 +562,7 @@ El sistema genera y utiliza los siguientes archivos:
   - `obtenerMaxIdDesdeTiquetes()`: Busca el máximo ID en `tiquetes.json`
   - `obtenerMaxIdDesdeAtendidos()`: Busca el máximo ID en `atendidos.json`
 
-#### `GrafoRutas` (Módulo 1.4 - Implementado por jiro)
+#### `GrafoRutas` (Módulo 1.4 - Implementado por Andrew)
 - **Propósito**: Grafo ponderado dirigido para representar rutas entre localidades usando arrays
 - **Métodos principales**:
   - `agregarVertice(Localidad)`: Agrega una localidad al grafo
@@ -514,7 +573,7 @@ El sistema genera y utiliza los siguientes archivos:
   - `obtenerVertices()`: Retorna array de vértices para serialización
   - `cargarVertices(VerticeGrafo[])`: Carga vértices desde array
 
-#### `GestionGrafo` (Módulo 1.4 - Implementado por jiro)
+#### `GestionGrafo` (Módulo 1.4 - Implementado por Andrew)
 - **Propósito**: Gestión completa del módulo 1.4 con menú y persistencia
 - **Métodos principales**:
   - `gestionarGrafo()`: Menú principal del módulo de grafos
@@ -524,19 +583,41 @@ El sistema genera y utiliza los siguientes archivos:
   - `agregarRuta()`: Permite agregar rutas desde el menú
   - `consultarRutaMasCorta()`: Consulta la ruta más corta entre dos localidades
 
-#### `Localidad` (Módulo 1.4 - Implementado por jiro)
+#### `Localidad` (Módulo 1.4 - Implementado por Samuel)
 - **Propósito**: Representa una localidad donde el bus puede parar
 - **Atributos**: `id`, `nombre`
 
-#### `VerticeGrafo` (Módulo 1.4 - Implementado por jiro)
+#### `VerticeGrafo` (Módulo 1.4 - Implementado por Samuel)
 - **Propósito**: Vértice del grafo con array de adyacentes
 - **Atributos**: `valor` (Localidad), `adyacentes` (array de AristaGrafo), `cantidadAristas` (int)
 - **Métodos principales**:
   - `agregarArista(AristaGrafo)`: Agrega una arista al vértice
 
-#### `AristaGrafo` (Módulo 1.4 - Implementado por jiro)
+#### `AristaGrafo` (Módulo 1.4 - Implementado por Gerald)
 - **Propósito**: Arista con peso para el grafo ponderado
 - **Atributos**: `destino` (Localidad), `peso` (int)
+
+#### `ServicioBCCR` (Módulo 1.5 - Implementado por Luna)
+- **Propósito**: Consumo del Web Service del Banco Central de Costa Rica para obtener el tipo de cambio
+- **Métodos principales**:
+  - `obtenerIndicador(String, String, String, String, String, String, String)`: Obtiene indicador económico del BCCR mediante HTTP POST
+  - `obtenerTipoCambioVenta()`: Obtiene el tipo de cambio de venta del dólar (indicador 318)
+- **Detalles técnicos**: Utiliza HttpClient de Java y JAXB para deserialización XML
+
+#### `IndicadorEconomico` (Módulo 1.5 - Implementado por Luna)
+- **Propósito**: Estructura de datos que representa la respuesta XML del BCCR
+- **Atributos**: `diffgram` (Diffgram) - estructura anidada con los datos del indicador
+- **Clases internas**:
+  - `Diffgram`: Contenedor de datos de indicadores
+  - `DatosDeIndicadores`: Lista de indicadores económicos
+  - `Indicador`: Representa un indicador individual con código, fecha y valor
+- **Detalles técnicos**: Utiliza anotaciones JAXB para mapeo XML
+
+#### `GestionTipoCambio` (Módulo 1.5 - Implementado por Luna)
+- **Propósito**: Gestión de la consulta del tipo de cambio del BCCR
+- **Métodos principales**:
+  - `consultarTipoCambio()`: Consulta el tipo de cambio y lo muestra al usuario mediante JOptionPane
+  - `extraerTipoCambio(IndicadorEconomico)`: Extrae el valor del tipo de cambio desde la estructura de respuesta
 
 ## Notas de Desarrollo
 
@@ -551,6 +632,7 @@ El sistema genera y utiliza los siguientes archivos:
 - **Integración del módulo 1.3:** Gerald integró las funcionalidades del módulo 1.3 en el menú principal de gestión de tiquetes, incluyendo la asignación automática de tiquetes a buses y la opción para ver el estado de las colas.
 - **GestorIdPasajero:** Implementado por Gerald para generar IDs autoincrementales de pasajeros, evitando duplicados y mejorando la experiencia de usuario.
 - **Integración módulo 1.3 con 1.2:** Implementada por Gerald, modificando `ModuloAtencionTiquetes` para que decremente las colas de buses cuando se atiende un tiquete, tanto si el pago es aceptado como rechazado.
+- **Módulo 1.5 - Consulta BCCR:** Implementado por Luna Delgado Durango, incluyendo integración con Web Service del Banco Central de Costa Rica, consulta de tipo de cambio en línea, conversión automática de montos a colones y opción de menú para consulta manual. El tipo de cambio se integra automáticamente en el cálculo de cobros del módulo 1.2.
 
 ## Correcciones Realizadas en Esta Entrega
 
@@ -573,7 +655,8 @@ El sistema genera y utiliza los siguientes archivos:
 - ✅ **Integración del módulo 1.3:** Gerald integró las funcionalidades del módulo 1.3 en el menú principal de gestión de tiquetes, incluyendo la asignación automática de tiquetes a buses (opción 1) y la opción para ver el estado de las colas (opción 5).
 - ✅ **GestorIdPasajero:** Implementado por Gerald para generar IDs autoincrementales, evitando duplicados.
 - ✅ **Integración módulo 1.3 con 1.2:** Implementada por Gerald, conectando el decremento de colas cuando se atiende un tiquete.
-- ✅ **Módulo 1.4 - Servicios Complementarios:** Implementado por jiro (Jeferson Andrew Fuentes García), incluyendo grafo ponderado dirigido usando arrays, algoritmo de Dijkstra para ruta más corta, definición de localidades y rutas desde ejecución, persistencia en `grafo.json` e integración en el menú principal.
+- ✅ **Módulo 1.4 - Servicios Complementarios:** Implementado principalmente por jiro (Jeferson Andrew Fuentes García) con las clases `GrafoRutas` (grafo ponderado dirigido usando arrays, algoritmo de Dijkstra para ruta más corta) y `GestionGrafo` (menú, persistencia en `grafo.json` e integración en el menú principal). Las clases `Localidad` y `VerticeGrafo` fueron implementadas por Samuel Alonso Mena Garro, y `AristaGrafo` fue implementada por Gerald Obed Herra Fonseca.
+- ✅ **Módulo 1.5 - Consulta BCCR:** Implementado por Luna Delgado Durango, incluyendo integración con Web Service del BCCR, consulta de tipo de cambio en línea, conversión automática de montos a colones en el módulo 1.2, opción de menú para consulta manual y manejo de errores cuando el servicio no está disponible.
 
 ### Mejoras Implementadas
 - ✅ **ID autoincremental:** Implementación de generación automática de IDs de pasajeros (Gerald - `GestorIdPasajero`)

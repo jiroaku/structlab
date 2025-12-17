@@ -1,22 +1,22 @@
 [
   {
-    "nombrePasajero": "andrew",
-    "idPasajero": 1,
-    "servicio": "vip",
-    "tipoBus": "Preferencial",
-    "busAsignado": "P1",
-    "terminal": "nova",
-    "horaAtencion": "24/11/2025 13:09:13",
-    "montoCobrado": 100.0
-  },
-  {
     "nombrePasajero": "Gerald",
     "idPasajero": 1,
-    "servicio": "VIP",
-    "tipoBus": "Preferencial",
-    "busAsignado": "P1",
+    "servicio": "Regular",
+    "tipoBus": "Normal",
+    "busAsignado": "N1",
     "terminal": "nova",
-    "horaAtencion": "16/12/2025 03:54:56",
-    "montoCobrado": 100.0
+    "horaAtencion": "16/12/2025 19:29:00",
+    "montoCobrado": 20.0
+  },
+  {
+    "nombrePasajero": "Andrew",
+    "idPasajero": 2,
+    "servicio": "Regular",
+    "tipoBus": "Directo",
+    "busAsignado": "D1",
+    "terminal": "nova",
+    "horaAtencion": "16/12/2025 19:31:23",
+    "montoCobrado": 20.0
   }
 ]
